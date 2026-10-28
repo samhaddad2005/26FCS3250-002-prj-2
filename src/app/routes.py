@@ -2,9 +2,8 @@ from flask import render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import RegistrationForm, LoginForm
+from app.forms import SignUpForm, LoginForm
 from app.models import User
-
 
 @app.route("/")
 @login_required
@@ -13,20 +12,21 @@ def index():
 
 
 @app.route("/register", methods=["GET", "POST"])
-def register():
-    form = RegistrationForm()
+def signup():
+    form = SignUpForm()
     if form.validate_on_submit():
-        user = User(
-            name=form.name.data.strip(),
-            email=form.email.data.strip().lower(),
-            role=form.role.data,
-        )
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash("Account created. Please log in.")
-        return redirect(url_for("login"))
-    return render_template("register.html", form=form)
+        email = form.email.data.strip().lower()
+        if form.password.data != form.password_confirm.data:
+            form.password_confirm.errors.append('Passwords do not match.')
+        elif db.session.scalar(db.select(User).filter_by(email=email)):
+            form.email.errors.append('That email is already taken.')
+        else:
+            user = User(email=email, name=form.name.data,role= form.role.data)
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('login'))
+    return render_template('signup.html', form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])

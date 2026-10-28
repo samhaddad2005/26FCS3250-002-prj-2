@@ -6,10 +6,11 @@ from app import db
 from app.models import User
 
 
-class RegistrationForm(FlaskForm):
+class SignUpForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
+    password_confirm= PasswordField("Confirm Password", validators=[DataRequired(), Length(min=8)])
     role = SelectField("I am a", choices=[("student", "Student"), ("vendor", "Vendor")])
     submit = SubmitField("Register")
 
