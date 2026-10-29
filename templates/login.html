@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block main %}
+<form action="" method="POST" novalidate>
+    {{ form.hidden_tag() }}
+    {% for field in [form.email, form.password] %}
+    <p>{{ field.label }} <br> {{ field() }}
+        {% for error in field.errors %}<br><span class="error">{{ error }}</span>{% endfor %}
+    </p>
+    {% endfor %}
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}

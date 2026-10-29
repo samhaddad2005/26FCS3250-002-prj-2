@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <title>CampusEats</title>
+</head>
+<body>
+<nav>
+    {% if current_user.is_authenticated %}
+        {{ current_user.name }} ({{ current_user.role }}) | <a href="{{ url_for('logout') }}">Log out</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Log in</a> | <a href="{{ url_for('signup') }}">Register</a>
+    {% endif %}
+</nav>
+{% for message in get_flashed_messages() %}
+    <p class="flash">{{ message }}</p>
+{% endfor %}
+{% block main %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block main %}
+<h1>Welcome, {{ current_user.name }}</h1>
+{% if current_user.role == "vendor" %}
+    <p>Vendor home: post and manage your surplus food listings.</p>
+{% else %}
+    <p>Student home: browse available food and manage your reservations.</p>
+{% endif %}
+{% endblock %}
