@@ -1,7 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, SubmitField
-from wtforms.validators import DataRequired, Email, Length, ValidationError
-
+from wtforms import (
+    StringField,
+    PasswordField,
+    SelectField,
+    SubmitField,
+    TextAreaField,
+    IntegerField,
+    DateTimeLocalField,
+    SelectMultipleField
+)
+from wtforms.validators import DataRequired, Email, Length, ValidationError, NumberRange
 from app import db
 from app.models import User
 
@@ -24,3 +32,14 @@ class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Log in")
+
+
+class FoodListingForm(FlaskForm):
+    title = StringField("Title", validators=[DataRequired(), Length(max=100)])
+    description = TextAreaField("Description", validators=[DataRequired()])
+    portions = IntegerField("Portions", validators=[DataRequired(), NumberRange(min=1, max=100)])
+    pickup_location = StringField("Pickup Location", validators=[DataRequired(), Length(max=200)])
+    dietary_tags = SelectMultipleField("Dietary Tags", choices=[("vegetarian", "Vegetarian"), ("vegan", "Vegan"), ("gluten-free", "Gluten-Free"),("halal", "Halal"),("contains nuts", "Contains Nuts")])
+    pickup_start = DateTimeLocalField("Pickup Start", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
+    pickup_end = DateTimeLocalField("Pickup End", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
+    submit = SubmitField("Create Listing")
