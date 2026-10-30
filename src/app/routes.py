@@ -1,9 +1,9 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, abort
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm
-from app.models import User
+from app.forms import SignUpForm, LoginForm, FoodListingForm
+from app.models import User, FoodListing
 
 @app.route("/")
 @login_required
@@ -50,3 +50,25 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for("login"))
+@app.route("/create_listing", methods=["GET", "POST"])
+@login_required
+def create_listing():
+    if current_user.role != "vendor":
+        abort(403)
+    form = FoodListingForm()
+    if form.validate_on_submit():
+        listing = FoodListing(
+            vendor_id=current_user.id,
+            title=form.title.data,
+            description=form.description.data,
+            portions=form.portions.data,
+            pickup_location=form.pickup_location.data,
+            dietary_tags= ",".join(form.dietary_tags.data),
+            pickup_start=form.pickup_start.data,
+            pickup_end=form.pickup_end.data
+        )
+        db.session.add(listing)
+        db.session.commit()
+        flash("Food listing created successfully.")
+        return redirect(url_for("index"))
+    return render_template("create_listing.html", form=form)
