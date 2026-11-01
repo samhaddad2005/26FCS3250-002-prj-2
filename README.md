@@ -142,17 +142,17 @@ Before writing any code, split the backlog across the three sprints and record i
 * Planned burndown: list the story points remaining at the start and after each planned sprint.
 
 ```
-Team capacity (story points per sprint): 10
+Team capacity (story points per sprint): 12
 
-Justification (one or two sentences: team size, hours available, course load): <justification>
+Justification (one or two sentences: team size, hours available, course load): There are five team members and each one has about 3-4 days (roughly 10 hours) to contribute per sprint. After the due date moved to November 15, the team agreed to raise capacity to 12 points per sprint so the bonus stories US8 to US10 fit alongside the required stories.
 ```
 
 | Sprint | User stories (in order) | Story points planned | Points remaining after sprint | Dependencies checked (Y/N) |
 | --- | --- | --- | --- | --- |
-| Sprint 1 | US1, US2, US3 | 10 | 16 | Y |
-| Sprint 2 | US4, US7 | 8 | 8 | Y |
-| Sprint 3 | US6, US5 | 8 | 0 | Y |
-| **Total** | 7 stories | 26 | — | — |
+| Sprint 1 | US1, US2, US3, US8 | 12 | 22 | Y |
+| Sprint 2 | US4, US7, US9 | 11 | 11 | Y |
+| Sprint 3 | US6, US5, US10 | 11 | 0 | Y |
+| **Total** | 10 stories | 34 | — | — |
 
 # Sprint Boards
 
