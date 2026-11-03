@@ -62,6 +62,7 @@ def create_listing():
             title=form.title.data,
             description=form.description.data,
             portions=form.portions.data,
+            portions_remaining=form.portions.data,
             pickup_location=form.pickup_location.data,
             dietary_tags= ",".join(form.dietary_tags.data),
             pickup_start=form.pickup_start.data,
@@ -72,3 +73,12 @@ def create_listing():
         flash("Food listing created successfully.")
         return redirect(url_for("index"))
     return render_template("create_listing.html", form=form)
+
+
+@app.route("/listings")
+@login_required
+def listings():
+    if current_user.role != "student":
+        abort(403)
+    available = db.session.scalars(FoodListing.available()).all()
+    return render_template("listings.html", listings=available)
