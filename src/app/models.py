@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask_login import UserMixin
 import bcrypt
 from app import db, login_manager
@@ -33,8 +34,23 @@ class FoodListing(db.Model):
     title = db.Column(db.String(200), nullable=False)
     description= db.Column(db.Text, nullable=False)
     portions = db.Column(db.Integer, nullable=False)
+    portions_remaining = db.Column(db.Integer, nullable=False)
+    cancelled = db.Column(db.Boolean, nullable=False, default=False)
     pickup_location = db.Column(db.String(200), nullable=False)
     dietary_tags = db.Column(db.String(200))
     pickup_start = db.Column(db.DateTime, nullable=False)
     pickup_end = db.Column(db.DateTime, nullable=False)
     
+    vendor = db.relationship("User")
+
+    @classmethod
+    def available(cls):
+        return (
+            db.select(cls)
+            .where(
+                cls.pickup_end > datetime.now(),
+                cls.portions_remaining > 0,
+                cls.cancelled.is_(False),
+            )
+            .order_by(cls.pickup_end, cls.id)
+        )

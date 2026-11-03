@@ -1,0 +1,46 @@
+{% extends "base.html" %} {% block main %}
+<h1>Available Food</h1>
+{% if listings %}
+<ul id="listings">
+  {% for listing in listings %}
+  <li
+    class="listing"
+    data-listing-id="{{ listing.id }}"
+    data-pickup-end="{{ listing.pickup_end.strftime('%Y-%m-%dT%H:%M') }}"
+  >
+    <h2 class="listing-title">{{ listing.title }}</h2>
+    <p>Vendor: <span class="listing-vendor">{{ listing.vendor.name }}</span></p>
+    <p>
+      Pickup location:
+      <span class="listing-location">{{ listing.pickup_location }}</span>
+    </p>
+    <p>
+      Dietary tags:
+      <span class="listing-tags">
+        {% for tag in (listing.dietary_tags or "").split(",") if tag %}
+        <span class="listing-tag">{{ tag|title }}</span>
+        {% else %} None {% endfor %}
+      </span>
+    </p>
+    <p>
+      Portions remaining:
+      <span class="listing-portions">{{ listing.portions_remaining }}</span>
+    </p>
+    <p>
+      Pickup window:
+      <span class="listing-pickup-start"
+        >{{ listing.pickup_start.strftime('%b %d, %Y %I:%M %p') }}</span
+      >
+      to
+      <span class="listing-pickup-end"
+        >{{ listing.pickup_end.strftime('%b %d, %Y %I:%M %p') }}</span
+      >
+    </p>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p id="no-listings">
+  No food listings are available right now. Check back later.
+</p>
+{% endif %} {% endblock %}
