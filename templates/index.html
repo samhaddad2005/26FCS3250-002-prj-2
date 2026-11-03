@@ -3,6 +3,7 @@
 <h1>Welcome, {{ current_user.name }}</h1>
 {% if current_user.role == "vendor" %}
     <p>Vendor home: post and manage your surplus food listings.</p>
+    <p><a href="{{ url_for('create_listing') }}">Create Food Listing</a></p>
 {% else %}
     <p>Student home: browse available food and manage your reservations.</p>
 {% endif %}

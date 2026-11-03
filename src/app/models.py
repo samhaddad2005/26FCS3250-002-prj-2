@@ -23,3 +23,18 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(User, int(user_id))
+
+
+
+class FoodListing(db.Model):
+    __tablename__ = "food_listings"
+    id = db.Column(db.Integer, primary_key=True)
+    vendor_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    description= db.Column(db.Text, nullable=False)
+    portions = db.Column(db.Integer, nullable=False)
+    pickup_location = db.Column(db.String(200), nullable=False)
+    dietary_tags = db.Column(db.String(200))
+    pickup_start = db.Column(db.DateTime, nullable=False)
+    pickup_end = db.Column(db.DateTime, nullable=False)
+    
