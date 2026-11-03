@@ -1,12 +1,64 @@
 @startuml class
-
+left to right direction
 class User {
-    email
-    name
-    creation_date
-    role
-    password
-    active
+  +id: Integer
+  +name: String
+  +email: String
+  +password_hash: String
+  +role: String
+  +set_password(password)
+  +check_password(password): Boolean
 }
+
+class FoodListing {
+  +id: Integer
+  +vendor_id: Integer
+  +title: String
+  +description: Text
+  +portions: Integer
+  +pickup_location: String
+  +dietary_tags: String
+  +pickup_start: DateTime
+  +pickup_end: DateTime
+
+}
+
+class DietaryTag{
+   +id: Integer
+   +name: String
+}
+
+class Reservation{
+  +id: Integer
+  +listing_id: Integer
+  +student_id: Integer
+  +portions: Integer
+  +pickup_code: String
+  +status: String
+  +created_at: DateTime
+}
+
+User "1" -- "0..*" FoodListing : creates (vendor)
+User "1" -- "0..*" Reservation : places (student)
+FoodListing "1" -- "0..*" Reservation : receives
+FoodListing "0..*" .. "0..*" DietaryTag : tagged with (planned)
+
+note right of User
+  US1: role = student or vendor.
+  creation_date / active not verified.
+end note
+
+note bottom of FoodListing
+  US2 implementation currently stores
+  dietary_tags as a String.
+  DietaryTag association is a proposed
+  normalized design, not yet implemented.
+end note
+
+note bottom of Reservation
+  US4 planned model; verify against
+  implementation when US4 is developed.
+end note
+
 
 @enduml
