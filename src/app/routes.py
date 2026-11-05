@@ -1,9 +1,14 @@
-from flask import render_template, redirect, url_for, flash, abort
+from flask import render_template, redirect, url_for, flash, abort, request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
 from app.forms import SignUpForm, LoginForm, FoodListingForm
-from app.models import User, FoodListing
+from app.models import User, FoodListing, Reservation
+
+import secrets
+from sqlalchemy.exc import IntegrityError
+
+from datetime import datetime
 
 @app.route("/")
 @login_required
@@ -82,3 +87,100 @@ def listings():
         abort(403)
     available = db.session.scalars(FoodListing.available()).all()
     return render_template("listings.html", listings=available)
+
+
+# US4: Generate a unique six-digit pickup code for a reservation.
+def generate_pickup_code():
+    for _ in range(10):
+        code = f"{secrets.randbelow(1000000):06d}"
+
+        existing = db.session.scalar(
+            db.select(Reservation.id).where(
+                Reservation.pickup_code == code
+            )
+        )
+
+        if existing is None:
+            return code
+
+    raise RuntimeError("Unable to generate a unique pickup code.")
+
+# US4: Reserve food portions.
+@app.route("/reserve/<int:listing_id>", methods=["POST"])
+@login_required
+def reserve(listing_id):
+    if current_user.role != "student":
+        abort(403)
+    
+    # Lock the listing to prevent concurrent overbooking.
+    listing = db.session.scalar(
+        db.select(FoodListing)
+        .where(FoodListing.id == listing_id)
+        .with_for_update() # Lock
+    )
+    if listing is None:
+        db.session.rollback()
+        abort(404)
+
+    # Reject cancelled or expired listings.
+    if listing.cancelled or listing.pickup_end <= datetime.now():
+        db.session.rollback()
+        abort(409, description="This listing is no longer available.")
+
+    # Validate the requested number of portions.
+    try:
+        portions = int(request.form.get("portions", ""))
+    except (ValueError, TypeError):
+        db.session.rollback()
+        abort(400, description="Invalid number of portions.")
+
+    if portions not in (1, 2):
+        db.session.rollback()
+        abort(400, description="You can reserve only 1 or 2 portions.")
+
+    # Reject requests that exceed the remaining portions.
+    if portions > listing.portions_remaining:
+        db.session.rollback()
+        abort(409, description="Not enough portions remaining.")
+    
+    # Check whether the student already has an active reservation.
+    existing_reservation = db.session.scalar(
+        db.select(Reservation).where(
+            Reservation.student_id == current_user.id,
+            Reservation.listing_id == listing_id,
+            Reservation.status == "active"
+        )
+    )
+    if existing_reservation is not None:
+        db.session.rollback()
+        abort(409, description="You already have an active reservation.")
+
+    # Generate a six-digit pickup code.
+    try:
+        pickup_code = generate_pickup_code()
+    except RuntimeError:
+        db.session.rollback() # Release the database lock.
+        abort(503, description="Unable to generate a pickup code. Please try again.")
+
+
+    # Decrease the remaining portions.
+    listing.portions_remaining -= portions
+
+    # Create the reservation.
+    reservation = Reservation(
+        student_id=current_user.id,
+        listing_id=listing_id,
+        portions=portions,
+        pickup_code=pickup_code,
+        status="active"
+    )
+
+    # Save the reservation and listing update together.
+    db.session.add(reservation)
+
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        abort(409, description="Reservation could not be completed.")
+    return f"Reservation successful! Pickup code: {pickup_code}", 201
