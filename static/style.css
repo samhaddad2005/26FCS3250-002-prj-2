@@ -1,3 +1,7 @@
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
     background: #f7f8f5;
@@ -32,9 +36,22 @@ body {
 }
 
 .page {
-    max-width: 60rem;
-    margin-inline: auto;
-    padding: 1.5rem 1rem;
+    width: calc(100% - 2rem);
+    max-width: 48rem;
+    margin: 2rem auto;
+    padding: clamp(1rem, 4vw, 2rem);
+    background: white;
+    border: 1px solid #d5ded7;
+    border-radius: 0.5rem;
+    overflow-wrap: anywhere;
+}
+
+.page > :first-child {
+    margin-top: 0;
+}
+
+.page > :last-child {
+    margin-bottom: 0;
 }
 
 .flash {
@@ -45,4 +62,5 @@ body {
 
 input, select, textarea, button {
     font: inherit;
+    max-width: 100%;
 }

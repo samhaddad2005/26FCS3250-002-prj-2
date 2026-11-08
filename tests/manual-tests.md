@@ -3,5 +3,9 @@
 | US4 | 2: if reservation is > portion then I should see an error | Sam Haddad | 11/05/2026 | Passed | All criterion were satisfied, I wanted to reserve 2 but only 1 was remaining and I got an error message |
 | US4 | 3: if I have active reservation for a listing when I try to reserve it again, then I am told I already have a reservation. | Sam Haddad | 11/05/2026 | Passed | All criterion were satisfied, I was not able to reserve it and got the message that I already have it |
 | US4 | 3: if there's 1 portion left and 2 users click on it at the same time only one works the second shows an error and never goes below 0 | Sam Haddad | 11/05/2026 | Passed | All criterion were satisfied, I opened one browser in vscode the other in chrome and clicked reserve as fast as possible 1 reserved the other got no portions left error but never went negative |
-
-
+| US7 | 1 — Confirm an active reservation during its pickup window | Miles Porter | 2026-11-07 | Pass | Vendor 1 entered the code for a reservation on their listing. The app confirmed the pickup and displayed the student's name and portion count. |
+| US7 | 2 — Reject an unknown pickup code | Miles Porter | 2026-11-07 | Pass | An unused code displayed “No reservation with that pickup code was found for your listings.” |
+| US7 | 2 — Reject a code belonging to another vendor | Miles Porter | 2026-11-07 | Pass | Vendor 2 entered a valid code for Vendor 1's listing and saw the no-reservation message. Vendor 1 then confirmed the same code successfully. |
+| US7 | 2 — Reject an already used code | Miles Porter | 2026-11-07 | Pass | Vendor 1 submitted the same code after confirming it and saw “This reservation is no longer active.” |
+| US7 | 2 — Reject a cancelled reservation's code | Miles Porter | — | Pending | The current branch has no browser flow for cancelling a reservation. |
+| US7 | 3 — Show all active reservations on an expired listing as no-shows | Miles Porter | 2026-11-07 | Pass | After the pickup window ended, both students who reserved from Food appeared under No-shows when the vendor opened Confirm Pickup with the code field empty. |

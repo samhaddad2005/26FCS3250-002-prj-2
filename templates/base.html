@@ -26,9 +26,11 @@
         <a href="{{ url_for('signup') }}">Register</a>
     {% endif %}
 </nav>
-{% for message in get_flashed_messages() %}
-    <p class="flash">{{ message }}</p>
-{% endfor %}
-{% block main %}{% endblock %}
+<main class="page">
+    {% for message in get_flashed_messages() %}
+        <p class="flash">{{ message }}</p>
+    {% endfor %}
+    {% block main %}{% endblock %}
+</main>
 </body>
 </html>
