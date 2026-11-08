@@ -5,6 +5,9 @@
 
 <form method="POST">
     {{ form.hidden_tag() }}
+    {% for error in form.csrf_token.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
 
     <p>
         {{ form.pickup_code.label }}
