@@ -1,0 +1,48 @@
+body {
+    margin: 0;
+    background: #f7f8f5;
+    color: #24312a;
+    font: 1rem/1.5 system-ui, sans-serif;
+}
+
+.toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    background: #214e36;
+    color: white;
+}
+
+.toolbar a {
+    color: inherit;
+}
+
+.toolbar .brand {
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.toolbar-account {
+    margin-inline-start: auto;
+}
+
+.page {
+    max-width: 60rem;
+    margin-inline: auto;
+    padding: 1.5rem 1rem;
+}
+
+.flash {
+    padding: 0.75rem;
+    background: #e4efe7;
+    border-radius: 0.25rem;
+}
+
+input, select, textarea, button {
+    font: inherit;
+}
