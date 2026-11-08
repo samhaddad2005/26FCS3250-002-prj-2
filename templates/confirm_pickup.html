@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h1>Confirm Pickup</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.pickup_code.label }}
+        {{ form.pickup_code }}
+    </p>
+    {% for error in form.pickup_code.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+
+    {{ form.submit() }}
+</form>
+{% endblock %}

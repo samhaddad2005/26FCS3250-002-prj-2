@@ -61,3 +61,11 @@ class FoodListingForm(FlaskForm):
             raise ValidationError("Pickup end must be after pickup start.")
         if field.data and field.data <= datetime.now():
           raise ValidationError("Pickup end must be in the future.")
+
+class ConfirmPickupForm(FlaskForm):
+    pickup_code = StringField(
+        "Pickup code",
+        filters=[lambda value: value.strip() if value else value],
+        validators=[DataRequired(), Length(min=6, max=6)],
+       )
+    submit = SubmitField("Confirm Pickup")

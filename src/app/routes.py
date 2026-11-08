@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, abort, request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm, FoodListingForm
+from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm
 from app.models import User, FoodListing, Reservation
 
 import secrets
@@ -184,3 +184,25 @@ def reserve(listing_id):
         db.session.rollback()
         abort(409, description="Reservation could not be completed.")
     return f"Reservation successful! Pickup code: {pickup_code}", 201
+
+@app.route("/confirm_pickup", methods=["GET", "POST"])
+@login_required
+def confirm_pickup():
+    if current_user.role != "vendor":
+        abort(403)
+
+    form = ConfirmPickupForm()
+    if form.validate_on_submit():
+        reservation = db.session.scalar(
+            db.select(Reservation)
+            .join(FoodListing, Reservation.listing_id == FoodListing.id)
+            .where(
+                Reservation.pickup_code == form.pickup_code.data,
+                FoodListing.vendor_id == current_user.id,
+            )
+        )
+
+        if reservation is None:
+            flash("No reservation with that pickup code was found for your listings.")
+
+    return render_template("confirm_pickup.html", form=form)
