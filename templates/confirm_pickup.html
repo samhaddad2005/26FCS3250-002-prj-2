@@ -16,4 +16,19 @@
 
     {{ form.submit() }}
 </form>
+
+<h2>No-shows</h2>
+{% if no_shows %}
+    <ul>
+    {% for reservation in no_shows %}
+        <li>
+            {{ reservation.listing_title }} - {{ reservation.student_name }}
+            ({{ reservation.portions }} portion(s)) - No-show
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No missed pickups.</p>
+{% endif %}
+
 {% endblock %}

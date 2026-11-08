@@ -228,4 +228,23 @@ def confirm_pickup():
                 flash(message)
                 return redirect(url_for("confirm_pickup"))
 
-    return render_template("confirm_pickup.html", form=form)
+    no_shows = db.session.execute(
+        db.select(
+            FoodListing.title.label("listing_title"),
+            User.name.label("student_name"),
+            Reservation.portions,
+        )
+        .select_from(Reservation)
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .join(User, Reservation.student_id == User.id)
+        .where(
+            FoodListing.vendor_id == current_user.id,
+            FoodListing.pickup_end <= datetime.now(),
+            Reservation.status == "active",
+        )
+        .order_by(FoodListing.pickup_end.desc(), Reservation.id)
+    ).all()
+
+    return render_template(
+        "confirm_pickup.html", form=form, no_shows=no_shows
+    )
