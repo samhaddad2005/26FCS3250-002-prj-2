@@ -200,9 +200,32 @@ def confirm_pickup():
                 Reservation.pickup_code == form.pickup_code.data,
                 FoodListing.vendor_id == current_user.id,
             )
+            .with_for_update()
         )
 
         if reservation is None:
             flash("No reservation with that pickup code was found for your listings.")
+        elif reservation.status != "active":
+            flash("This reservation is no longer active.")
+        else:
+            listing = db.session.get(FoodListing, reservation.listing_id)
+            now = datetime.now()
+
+            if listing.cancelled:
+                flash("This listing was cancelled.")
+            elif now < listing.pickup_start:
+                flash("This pickup window has not started yet.")
+            elif now > listing.pickup_end:
+                flash("The pickup window has ended.")
+            else:
+                student = db.session.get(User, reservation.student_id)
+                message = (
+                    f"Pickup confirmed for {student.name}. "
+                    f"Portions to hand out: {reservation.portions}"
+                )
+                reservation.status = "picked_up"
+                db.session.commit()
+                flash(message)
+                return redirect(url_for("confirm_pickup"))
 
     return render_template("confirm_pickup.html", form=form)
