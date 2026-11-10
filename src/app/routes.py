@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, abort, request
+from flask import render_template, redirect, url_for, flash, abort,request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
@@ -85,8 +85,32 @@ def create_listing():
 def listings():
     if current_user.role != "student":
         abort(403)
+    selected_tags = request.args.getlist("tags")
+    selected_location = request.args.get("location")
     available = db.session.scalars(FoodListing.available()).all()
-    return render_template("listings.html", listings=available)
+    if selected_tags:
+        available = [
+            listing for listing in available
+            if all(
+                tag in (listing.dietary_tags or "").split(",")
+                or (
+                    tag == "vegetarian"
+                    and "vegan" in (listing.dietary_tags or "").split(",")
+                )
+                for tag in selected_tags
+            )
+        ]
+    if selected_location:
+        available = [
+            listing for listing in available
+            if selected_location.lower() in listing.pickup_location.lower()
+        ]
+    return render_template(
+        "listings.html",
+         listings=available,
+         selected_tags=selected_tags,
+         selected_location=selected_location
+)
 
 
 # US4: Generate a unique six-digit pickup code for a reservation.
