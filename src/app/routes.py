@@ -218,6 +218,8 @@ def confirm_pickup():
     if current_user.role != "vendor":
         abort(403)
 
+    update_no_shows()
+
     form = ConfirmPickupForm()
     if form.validate_on_submit():
         reservation = db.session.scalar(
@@ -242,7 +244,7 @@ def confirm_pickup():
                 flash("This listing was cancelled.")
             elif now < listing.pickup_start:
                 flash("This pickup window has not started yet.")
-            elif now > listing.pickup_end:
+            elif listing.pickup_end <= now:
                 flash("The pickup window has ended.")
             else:
                 student = db.session.get(User, reservation.student_id)
@@ -266,8 +268,8 @@ def confirm_pickup():
         .join(User, Reservation.student_id == User.id)
         .where(
             FoodListing.vendor_id == current_user.id,
-            FoodListing.pickup_end <= datetime.now(),
-            Reservation.status == "active",
+            Reservation.status == "no-show",
+            FoodListing.cancelled.is_(False)
         )
         .order_by(FoodListing.pickup_end.desc(), Reservation.id)
     ).all()
@@ -282,6 +284,8 @@ def confirm_pickup():
 def my_reservations():
     if current_user.role != "student":
         abort(403)
+    
+    update_no_shows()
 
     reservations = db.session.scalars(
         db.select(Reservation).where(
@@ -349,3 +353,21 @@ def cancel_reservation(reservation_id):
     # Return to My Reservations.
     flash("Reservation cancelled successfully.")
     return redirect(url_for("my_reservations"))
+
+def update_no_shows():
+    now = datetime.now()
+
+    reservations = db.session.scalars(
+        db.select(Reservation)
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            Reservation.status == "active",
+            FoodListing.pickup_end <= now,
+            FoodListing.cancelled.is_(False)
+        )
+        .with_for_update(of=Reservation)
+    ).all()
+
+    for reservation in reservations:
+        reservation.status = "no-show"
+    db.session.commit()

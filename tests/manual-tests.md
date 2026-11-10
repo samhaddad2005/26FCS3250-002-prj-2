@@ -21,3 +21,9 @@
 | US7 | 2 — Reject an already used code | Miles Porter | 2026-11-07 | Pass | Vendor 1 submitted the same code after confirming it and saw “This reservation is no longer active.” |
 | US7 | 2 — Reject a cancelled reservation's code | Miles Porter | — | Pending | The current branch has no browser flow for cancelling a reservation. |
 | US7 | 3 — Show all active reservations on an expired listing as no-shows | Miles Porter | 2026-11-07 | Pass | After the pickup window ended, both students who reserved from Food appeared under No-shows when the vendor opened Confirm Pickup with the code field empty. |
+| US7 | 3 — Expired active reservations transition to no-show | Miles Porter | 2026-11-10 | Pass | Verified two expired reservations (pickup codes 599442 and 213586) changed from `active` to `no-show` when accessing My Reservations. |
+| US7 | 3 — No-show status persists in PostgreSQL | Miles Porter | 2026-11-10 | Pass | Queried the database in a separate Python session. Both reservations returned `no-show`, confirming changes were committed. |
+| US7 | 3 — Existing reservation statuses remain unchanged | Miles Porter | 2026-11-10 | Pass | Verified `picked_up` and `cancelled` reservations retained their statuses after the update. |
+| US7 | 3 — Unexpired reservations remain active | Miles Porter | 2026-11-10 | Pass | Verified an active reservation with pickup window ending November 12 remained `active`. |
+| US7 | 3 — Vendor can view no-show reservations | Miles Porter | 2026-11-10 | Pass | Logged in as the vendor and verified expired reservations appeared in the Confirm Pickup page's No-shows section with correct student names and portion counts. |
+| US7 | 2 — Vendor cannot confirm pickup for a no-show | Miles Porter | 2026-11-10 | Pass | Submitted pickup code 599442. Application displayed "This reservation is no longer active." Reservation remained in the No-shows list. |
