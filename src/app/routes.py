@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, abort,request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm, FoodListingForm
+from app.forms import SignUpForm, LoginForm, FoodListingForm, CancelReservationForm
 from app.models import User, FoodListing, Reservation
 
 import secrets
@@ -208,3 +208,77 @@ def reserve(listing_id):
         db.session.rollback()
         abort(409, description="Reservation could not be completed.")
     return f"Reservation successful! Pickup code: {pickup_code}", 201
+
+# US6: Display reservations belonging to the logged-in student.
+@app.route("/my_reservations")
+@login_required
+def my_reservations():
+    if current_user.role != "student":
+        abort(403)
+
+    reservations = db.session.scalars(
+        db.select(Reservation).where(
+            Reservation.student_id == current_user.id
+        )
+    ).all()
+
+    # Create a CSRF-protected cancellation form.
+    cancel_form = CancelReservationForm()
+
+    # Pass reservations, cancellation form, and current time to Jinja.
+    return render_template(
+        "my_reservations.html",
+        reservations=reservations,
+        cancel_form=cancel_form,
+        now=datetime.now()
+    )
+
+# US6: Cancel a student's reservation.
+@app.route("/cancel_reservation/<int:reservation_id>", methods=["POST"])
+@login_required
+def cancel_reservation(reservation_id):
+    if current_user.role != "student":
+        abort(403)
+
+    form = CancelReservationForm()
+    if not form.validate_on_submit():
+        abort(400, description="Invalid or missing CSRF token.")
+    
+    # Find the reservation before accessing its listing_id.
+    reservation = db.session.get(Reservation, reservation_id)
+    if reservation is None:
+        abort(404)
+    if reservation.student_id != current_user.id:
+        abort(403)
+
+    # Lock the food listing before modifying its portions.
+    listing = db.session.scalar(
+        db.select(FoodListing)
+        .where(FoodListing.id == reservation.listing_id)
+        .with_for_update()
+    )
+
+    # Lock and reload the reservation.
+    db.session.expire(reservation)
+    reservation = db.session.scalar(
+        db.select(Reservation)
+        .where(Reservation.id == reservation_id)
+        .with_for_update()
+    )
+
+    # Validate reservation cancellation eligibility
+    if reservation.status != "active":
+        db.session.rollback()
+        abort(409, description="Reservation is not active.")
+    if reservation.listing.pickup_end <= datetime.now():
+        db.session.rollback()
+        abort(409, description="Pickup window has ended.")
+
+    # Cancel the reservation and restore available portions
+    listing.portions_remaining += reservation.portions
+    reservation.status = "cancelled"
+    db.session.commit()
+
+    # Return to My Reservations.
+    flash("Reservation cancelled successfully.")
+    return redirect(url_for("my_reservations"))

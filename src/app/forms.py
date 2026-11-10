@@ -61,3 +61,7 @@ class FoodListingForm(FlaskForm):
             raise ValidationError("Pickup end must be after pickup start.")
         if field.data and field.data <= datetime.now():
           raise ValidationError("Pickup end must be in the future.")
+
+# US6: Form for cancelling a reservation.
+class CancelReservationForm(FlaskForm):
+    submit = SubmitField("Cancel")
