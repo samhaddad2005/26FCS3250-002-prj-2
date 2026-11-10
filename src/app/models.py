@@ -80,5 +80,7 @@ class Reservation(db.Model):
         nullable=False,
         default="active"
     )
+    # US6: Connect each reservation to its food listing.
+    listing = db.relationship("FoodListing")
 
 

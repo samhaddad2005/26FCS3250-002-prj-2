@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h2>My Reservations</h2>
+{% if reservations %}
+    {% for reservation in reservations %}
+        <div class="reservation">
+            <h3>{{ reservation.listing.title }}</h3>
+
+            <p>Vendor: {{ reservation.listing.vendor.name }}</p>
+            <p>Location: {{ reservation.listing.pickup_location }}</p>
+            <p>Pickup Start: {{ reservation.listing.pickup_start }}</p>
+            <p>Pickup End: {{ reservation.listing.pickup_end }}</p>
+            <p>Portions: {{ reservation.portions }}</p>
+            <p>Pickup Code: {{ reservation.pickup_code }}</p>
+            <p>Status: {{ reservation.status }}</p>
+            {% if reservation.status == "active" and reservation.listing.pickup_end > now %}
+                <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST">
+                    {{ cancel_form.hidden_tag() }}
+                    <button type="submit">Cancel</button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You have no reservations yet.</p>
+{% endif %}
+
+{% endblock %}
