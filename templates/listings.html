@@ -80,6 +80,18 @@
         >{{ listing.pickup_end.strftime('%b %d, %Y %I:%M %p') }}</span
       >
     </p>
+
+    <!-- US4: Allow students to reserve portions. -->
+    <form action="{{ url_for('reserve', listing_id=listing.id) }}" method="POST">
+
+      <select name="portions">
+        <option value="1">1 portion</option>
+        <option value="2">2 portions</option>
+      </select>
+
+      <button type="submit">Reserve</button>
+    </form>
+
   </li>
   {% endfor %}
 </ul>
