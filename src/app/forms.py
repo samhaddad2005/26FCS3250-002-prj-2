@@ -69,3 +69,7 @@ class ConfirmPickupForm(FlaskForm):
         validators=[DataRequired(), Length(min=6, max=6)],
        )
     submit = SubmitField("Confirm Pickup")
+
+# US6: Form for cancelling a reservation.
+class CancelReservationForm(FlaskForm):
+    submit = SubmitField("Cancel")

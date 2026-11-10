@@ -1,8 +1,8 @@
-from flask import render_template, redirect, url_for, flash, abort, request
+from flask import render_template, redirect, url_for, flash, abort,request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm
+from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm, CancelReservationForm
 from app.models import User, FoodListing, Reservation
 
 import secrets
@@ -85,8 +85,32 @@ def create_listing():
 def listings():
     if current_user.role != "student":
         abort(403)
+    selected_tags = request.args.getlist("tags")
+    selected_location = request.args.get("location")
     available = db.session.scalars(FoodListing.available()).all()
-    return render_template("listings.html", listings=available)
+    if selected_tags:
+        available = [
+            listing for listing in available
+            if all(
+                tag in (listing.dietary_tags or "").split(",")
+                or (
+                    tag == "vegetarian"
+                    and "vegan" in (listing.dietary_tags or "").split(",")
+                )
+                for tag in selected_tags
+            )
+        ]
+    if selected_location:
+        available = [
+            listing for listing in available
+            if selected_location.lower() in listing.pickup_location.lower()
+        ]
+    return render_template(
+        "listings.html",
+         listings=available,
+         selected_tags=selected_tags,
+         selected_location=selected_location
+)
 
 
 # US4: Generate a unique six-digit pickup code for a reservation.
@@ -248,3 +272,77 @@ def confirm_pickup():
     return render_template(
         "confirm_pickup.html", form=form, no_shows=no_shows
     )
+
+# US6: Display reservations belonging to the logged-in student.
+@app.route("/my_reservations")
+@login_required
+def my_reservations():
+    if current_user.role != "student":
+        abort(403)
+
+    reservations = db.session.scalars(
+        db.select(Reservation).where(
+            Reservation.student_id == current_user.id
+        )
+    ).all()
+
+    # Create a CSRF-protected cancellation form.
+    cancel_form = CancelReservationForm()
+
+    # Pass reservations, cancellation form, and current time to Jinja.
+    return render_template(
+        "my_reservations.html",
+        reservations=reservations,
+        cancel_form=cancel_form,
+        now=datetime.now()
+    )
+
+# US6: Cancel a student's reservation.
+@app.route("/cancel_reservation/<int:reservation_id>", methods=["POST"])
+@login_required
+def cancel_reservation(reservation_id):
+    if current_user.role != "student":
+        abort(403)
+
+    form = CancelReservationForm()
+    if not form.validate_on_submit():
+        abort(400, description="Invalid or missing CSRF token.")
+    
+    # Find the reservation before accessing its listing_id.
+    reservation = db.session.get(Reservation, reservation_id)
+    if reservation is None:
+        abort(404)
+    if reservation.student_id != current_user.id:
+        abort(403)
+
+    # Lock the food listing before modifying its portions.
+    listing = db.session.scalar(
+        db.select(FoodListing)
+        .where(FoodListing.id == reservation.listing_id)
+        .with_for_update()
+    )
+
+    # Lock and reload the reservation.
+    db.session.expire(reservation)
+    reservation = db.session.scalar(
+        db.select(Reservation)
+        .where(Reservation.id == reservation_id)
+        .with_for_update()
+    )
+
+    # Validate reservation cancellation eligibility
+    if reservation.status != "active":
+        db.session.rollback()
+        abort(409, description="Reservation is not active.")
+    if reservation.listing.pickup_end <= datetime.now():
+        db.session.rollback()
+        abort(409, description="Pickup window has ended.")
+
+    # Cancel the reservation and restore available portions
+    listing.portions_remaining += reservation.portions
+    reservation.status = "cancelled"
+    db.session.commit()
+
+    # Return to My Reservations.
+    flash("Reservation cancelled successfully.")
+    return redirect(url_for("my_reservations"))
