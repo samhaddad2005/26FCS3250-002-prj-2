@@ -7,7 +7,7 @@ from app.models import User, FoodListing, Reservation
 
 import secrets
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy import func
 from datetime import datetime
 
 @app.route("/")
@@ -371,3 +371,32 @@ def update_no_shows():
     for reservation in reservations:
         reservation.status = "no-show"
     db.session.commit()
+
+# US9: Vendor impact dashboard
+@app.route("/impact_dashboard")
+@login_required
+def impact_dashboard():
+    if current_user.role != "vendor":
+        abort(403)
+    update_no_shows()
+    rescued_portions = db.session.scalar(
+        db.select(func.sum(Reservation.portions))
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            FoodListing.vendor_id == current_user.id,
+            Reservation.status == "picked_up"
+        )
+    ) or 0
+    no_show_count = db.session.scalar(
+        db.select(func.count(Reservation.id))
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            FoodListing.vendor_id == current_user.id,
+            Reservation.status == "no-show"
+        )
+    )
+    return render_template(
+        "impact_dashboard.html",
+        rescued_portions=rescued_portions,
+        no_show_count=no_show_count
+    )
