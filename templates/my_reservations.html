@@ -17,7 +17,9 @@
             {% if reservation.status == "active" and reservation.listing.pickup_end > now %}
                 <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST">
                     {{ cancel_form.hidden_tag() }}
-                    <button type="submit">Cancel</button>
+                    <button type="submit" class="cancel-button">
+                        Cancel Reservation
+                    </button>
                 </form>
             {% endif %}
         </div>

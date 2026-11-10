@@ -207,7 +207,10 @@ def reserve(listing_id):
     except IntegrityError:
         db.session.rollback()
         abort(409, description="Reservation could not be completed.")
-    return f"Reservation successful! Pickup code: {pickup_code}", 201
+    return render_template(
+        "reservation_success.html",
+        pickup_code=pickup_code
+        ), 201
 
 @app.route("/confirm_pickup", methods=["GET", "POST"])
 @login_required
