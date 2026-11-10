@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, abort,request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm, FoodListingForm, CancelReservationForm
+from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm, CancelReservationForm
 from app.models import User, FoodListing, Reservation
 
 import secrets
@@ -207,7 +207,76 @@ def reserve(listing_id):
     except IntegrityError:
         db.session.rollback()
         abort(409, description="Reservation could not be completed.")
-    return f"Reservation successful! Pickup code: {pickup_code}", 201
+    return render_template(
+        "reservation_success.html",
+        pickup_code=pickup_code
+        ), 201
+
+@app.route("/confirm_pickup", methods=["GET", "POST"])
+@login_required
+def confirm_pickup():
+    if current_user.role != "vendor":
+        abort(403)
+
+    update_no_shows()
+
+    form = ConfirmPickupForm()
+    if form.validate_on_submit():
+        reservation = db.session.scalar(
+            db.select(Reservation)
+            .join(FoodListing, Reservation.listing_id == FoodListing.id)
+            .where(
+                Reservation.pickup_code == form.pickup_code.data,
+                FoodListing.vendor_id == current_user.id,
+            )
+            .with_for_update()
+        )
+
+        if reservation is None:
+            flash("No reservation with that pickup code was found for your listings.")
+        elif reservation.status != "active":
+            flash("This reservation is no longer active.")
+        else:
+            listing = db.session.get(FoodListing, reservation.listing_id)
+            now = datetime.now()
+
+            if listing.cancelled:
+                flash("This listing was cancelled.")
+            elif now < listing.pickup_start:
+                flash("This pickup window has not started yet.")
+            elif listing.pickup_end <= now:
+                flash("The pickup window has ended.")
+            else:
+                student = db.session.get(User, reservation.student_id)
+                message = (
+                    f"Pickup confirmed for {student.name}. "
+                    f"Portions to hand out: {reservation.portions}"
+                )
+                reservation.status = "picked_up"
+                db.session.commit()
+                flash(message)
+                return redirect(url_for("confirm_pickup"))
+
+    no_shows = db.session.execute(
+        db.select(
+            FoodListing.title.label("listing_title"),
+            User.name.label("student_name"),
+            Reservation.portions,
+        )
+        .select_from(Reservation)
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .join(User, Reservation.student_id == User.id)
+        .where(
+            FoodListing.vendor_id == current_user.id,
+            Reservation.status == "no-show",
+            FoodListing.cancelled.is_(False)
+        )
+        .order_by(FoodListing.pickup_end.desc(), Reservation.id)
+    ).all()
+
+    return render_template(
+        "confirm_pickup.html", form=form, no_shows=no_shows
+    )
 
 # US6: Display reservations belonging to the logged-in student.
 @app.route("/my_reservations")
@@ -215,6 +284,8 @@ def reserve(listing_id):
 def my_reservations():
     if current_user.role != "student":
         abort(403)
+    
+    update_no_shows()
 
     reservations = db.session.scalars(
         db.select(Reservation).where(
@@ -282,3 +353,21 @@ def cancel_reservation(reservation_id):
     # Return to My Reservations.
     flash("Reservation cancelled successfully.")
     return redirect(url_for("my_reservations"))
+
+def update_no_shows():
+    now = datetime.now()
+
+    reservations = db.session.scalars(
+        db.select(Reservation)
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            Reservation.status == "active",
+            FoodListing.pickup_end <= now,
+            FoodListing.cancelled.is_(False)
+        )
+        .with_for_update(of=Reservation)
+    ).all()
+
+    for reservation in reservations:
+        reservation.status = "no-show"
+    db.session.commit()

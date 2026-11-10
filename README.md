@@ -219,6 +219,32 @@ Write one automated black box test with Selenium for one user story of your choi
 | US1 | 2: duplicate email rejected | Name | 99/99/26 | passed |  |
 | ... | ... | ... | ... | ... | ... |
 
+## Run the US7 Selenium tests
+
+Install Google Chrome, then install the test dependencies:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+```
+
+Start the app with its PostgreSQL connection and secret key configured in `.env`, using a test database. With the app running at `http://localhost:5000`, run:
+
+```sh
+.venv/bin/python -m pytest tests/test_us7.py -v
+```
+
+Selenium Manager finds or downloads ChromeDriver automatically. If port 5000 is occupied (for example, by macOS AirPlay), start the app on another port in a separate terminal and set the test URL:
+
+```sh
+.venv/bin/python -m flask --app src/run.py run --host 127.0.0.1 --port 5057
+TEST_BASE_URL=http://127.0.0.1:5057 .venv/bin/python -m pytest tests/test_us7.py -v
+```
+
+The tests register unique accounts and create listings and reservations through the browser, so no `TEST_*` credentials or pickup codes are needed. These records remain in the database. The no-show case uses a pickup window ending within 90 seconds, allowing at least 30 seconds for setup because the form accepts minute precision. Cancelled-reservation rejection remains a manual coverage gap because the current app has no cancellation UI.
+
+A successful run reports 2 passed. Run the app and the test runner in the same time zone so the pickup windows match.
+
 # Repository Structure
 
 ```

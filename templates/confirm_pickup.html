@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block main %}
+<h1>Confirm Pickup</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {% for error in form.csrf_token.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+
+    <p>
+        {{ form.pickup_code.label }}
+        {{ form.pickup_code }}
+    </p>
+    {% for error in form.pickup_code.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+
+    {{ form.submit() }}
+</form>
+
+<h2>No-shows</h2>
+{% if no_shows %}
+    <ul>
+    {% for reservation in no_shows %}
+        <li>
+            {{ reservation.listing_title }} - {{ reservation.student_name }}
+            ({{ reservation.portions }} portion(s)) - No-show
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No missed pickups.</p>
+{% endif %}
+
+{% endblock %}
