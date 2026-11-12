@@ -28,3 +28,6 @@
 | US7 | 3 — Unexpired reservations remain active | Miles Porter | 2026-11-10 | Pass | Verified an active reservation with pickup window ending November 12 remained `active`. |
 | US7 | 3 — Vendor can view no-show reservations | Miles Porter | 2026-11-10 | Pass | Logged in as the vendor and verified expired reservations appeared in the Confirm Pickup page's No-shows section with correct student names and portion counts. |
 | US7 | 2 — Vendor cannot confirm pickup for a no-show | Miles Porter | 2026-11-10 | Pass | Submitted pickup code 599442. Application displayed "This reservation is no longer active." Reservation remained in the No-shows list. |
+| US9 | 1: As a vendor, when I open the dashboard and choose a date range, then I see the number of listings posted, portions posted, portions picked up, and no-show count for my listings in that range| Sam Haddad | 11/11/2026 | Passed | All criterion were satisfied, I saw portions only based on the date when I went too far back I saw nothing same with when I went too far ahead|
+| US9 | 2: No show rate is in percentage| Sam Haddad | 11/11/2026 | Passed | Had a % sign at the end|
+| US9 | 3: Given there is no data in the range, then all values show 0 and no error occurs | Sam Haddad | 11/11/2026 | Passed | As I was going back and forth with the dates the out of range postings were 0|

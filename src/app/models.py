@@ -40,7 +40,7 @@ class FoodListing(db.Model):
     dietary_tags = db.Column(db.String(200))
     pickup_start = db.Column(db.DateTime, nullable=False)
     pickup_end = db.Column(db.DateTime, nullable=False)
-    
+    created_at = db.Column(db.DateTime, nullable=False,default=datetime.now)
     vendor = db.relationship("User")
 
     @classmethod

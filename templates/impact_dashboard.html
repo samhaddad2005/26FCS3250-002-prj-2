@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>Vendor Impact Dashboard</h1>
+<form method="GET" action="{{ url_for('impact_dashboard') }}">
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+
+    <button type="submit">Filter</button>
+</form>
+<h2>Listings Posted</h2>
+<p>{{ listings_posted }}</p>
+<h2>Portions Posted</h2>
+<p>{{ portions_posted }}</p>
+<h2>Portions Rescued</h2>
+<p>{{ rescued_portions }}</p>
+<h2>No-Shows</h2>
+<p>{{ no_show_count }}</p>
+<h2>No-Show Rate</h2>
+<p>{{ "%.2f"|format(no_show_rate) }}%</p>
+{% endblock %}
