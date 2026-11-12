@@ -6,10 +6,11 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <title>CampusEats</title>
 </head>
-<body>
+<body{% if current_user.is_authenticated and current_user.role == "vendor" %} class="vendor"{% endif %}>
 <nav class="toolbar" aria-label="Main navigation">
     <a class="brand" href="{{ url_for('index') }}">CampusEats</a>
     <a href="{{ url_for('index') }}">Home</a>
+
 
     {% if current_user.is_authenticated %}
         {% if current_user.role == "vendor" %}
@@ -25,14 +26,16 @@
         <a href="{{ url_for('logout') }}">Log out</a>
     {% else %}
         <a href="{{ url_for('login') }}">Log in</a>
-        <a href="{{ url_for('signup') }}">Register</a>
     {% endif %}
 </nav>
-<main class="page">
+<main class="page{% block page_class %}{% endblock %}">
     {% for message in get_flashed_messages() %}
         <p class="flash">{{ message }}</p>
     {% endfor %}
     {% block main %}{% endblock %}
 </main>
+{% if not (current_user.is_authenticated and current_user.role == "vendor") %}
+<footer class="site-footer">CampusEats · Rescuing surplus food on campus</footer>
+{% endif %}
 </body>
 </html>

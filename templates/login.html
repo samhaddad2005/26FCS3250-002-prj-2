@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
+{% block page_class %} page--auth{% endblock %}
 {% block main %}
-<form action="" method="POST" novalidate>
-    {{ form.hidden_tag() }}
-    {% for field in [form.email, form.password] %}
-    <p>{{ field.label }} <br> {{ field() }}
-        {% for error in field.errors %}<br><span class="error">{{ error }}</span>{% endfor %}
-    </p>
-    {% endfor %}
-    <p>{{ form.submit() }}</p>
-</form>
+<div class="auth">
+    <div class="auth-form">
+        <h1>Welcome back</h1>
+        <p class="lead">Log in to your CampusEats account.</p>
+        <form action="" method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            {% for field in [form.email, form.password] %}
+            <p class="field">{{ field.label }} {{ field() }}
+                {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </p>
+            {% endfor %}
+            <p>{{ form.submit() }}</p>
+        </form>
+        <p class="auth-switch">Don't have an account? <a href="{{ url_for('signup') }}">Register here</a></p>
+    </div>
+</div>
 {% endblock %}

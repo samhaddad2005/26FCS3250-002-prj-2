@@ -3,35 +3,37 @@
 <form method="GET" action="{{ url_for('listings') }}">
   <h3>Filter by Dietary Tags</h3>
 
-  <label>
+  <div class="chips">
+  <label class="chip">
     <input type="checkbox" name="tags" value="vegetarian"
     {% if "vegetarian" in selected_tags %}checked{% endif %}>
     Vegetarian
   </label>
 
-  <label>
+  <label class="chip">
     <input type="checkbox" name="tags" value="vegan"
     {% if "vegan" in selected_tags %}checked{% endif %}>
     Vegan
   </label>
 
-  <label>
+  <label class="chip">
     <input type="checkbox" name="tags" value="gluten-free"
     {% if "gluten-free" in selected_tags %}checked{% endif %}>
     Gluten-Free
   </label>
 
-  <label>
+  <label class="chip">
     <input type="checkbox" name="tags" value="halal"
     {% if "halal" in selected_tags %}checked{% endif %}>
     Halal
   </label>
 
-  <label>
+  <label class="chip">
     <input type="checkbox" name="tags" value="contains nuts"
     {% if "contains nuts" in selected_tags %}checked{% endif %}>
     Contains Nuts
   </label>
+  </div>
   <h3>Filter by Campus Location</h3>
 
 <label for="location">Pickup Location:</label>

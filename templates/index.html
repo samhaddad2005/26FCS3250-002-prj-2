@@ -7,7 +7,9 @@
     <p><a href="{{ url_for('confirm_pickup') }}">Confirm Pickup</p></a>
 {% else %}
     <p>Student home: browse available food and manage your reservations.</p>
-    <p><a id="browse-listings-link" href="{{ url_for('listings') }}">Browse Listings</a></p>
-    <p><a href="{{ url_for('my_reservations') }}">My Reservations</a></p>
+    <p class="home-actions">
+        <a class="button-link" id="browse-listings-link" href="{{ url_for('listings') }}">Browse Listings</a>
+        <a class="button-link" href="{{ url_for('my_reservations') }}">My Reservations</a>
+    </p>
 {% endif %}
 {% endblock %}

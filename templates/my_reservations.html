@@ -1,19 +1,27 @@
 {% extends "base.html" %}
+{% block page_class %} page--wide{% endblock %}
 
 {% block main %}
-<h2>My Reservations</h2>
+<h1>My Reservations</h1>
 {% if reservations %}
+<p class="lead">Show the pickup code to the vendor during the pickup window.</p>
+<div class="reservation-grid">
     {% for reservation in reservations %}
-        <div class="reservation">
-            <h3>{{ reservation.listing.title }}</h3>
+        <div class="reservation card">
+            <div class="reservation-head">
+                <h3>{{ reservation.listing.title }}</h3>
+                <span class="status status--{{ reservation.status }}">{{ reservation.status }}</span>
+            </div>
 
-            <p>Vendor: {{ reservation.listing.vendor.name }}</p>
-            <p>Location: {{ reservation.listing.pickup_location }}</p>
-            <p>Pickup Start: {{ reservation.listing.pickup_start }}</p>
-            <p>Pickup End: {{ reservation.listing.pickup_end }}</p>
-            <p>Portions: {{ reservation.portions }}</p>
-            <p>Pickup Code: {{ reservation.pickup_code }}</p>
-            <p>Status: {{ reservation.status }}</p>
+            <p class="pickup-code-box">
+                <span class="meta-label">Pickup Code:</span>
+                <strong class="pickup-code">{{ reservation.pickup_code }}</strong>
+            </p>
+            <p><span class="meta-label">Vendor:</span> {{ reservation.listing.vendor.name }}</p>
+            <p><span class="meta-label">Location:</span> {{ reservation.listing.pickup_location }}</p>
+            <p><span class="meta-label">Pickup Start:</span> {{ reservation.listing.pickup_start.strftime('%b %d, %Y %I:%M %p') }}</p>
+            <p><span class="meta-label">Pickup End:</span> {{ reservation.listing.pickup_end.strftime('%b %d, %Y %I:%M %p') }}</p>
+            <p><span class="meta-label">Portions:</span> {{ reservation.portions }}</p>
             {% if reservation.status == "active" and reservation.listing.pickup_end > now %}
                 <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST">
                     {{ cancel_form.hidden_tag() }}
@@ -24,8 +32,12 @@
             {% endif %}
         </div>
     {% endfor %}
+</div>
 {% else %}
-    <p>You have no reservations yet.</p>
+    <p class="empty-state">
+        You have no reservations yet.<br>
+        <a class="text-link" href="{{ url_for('listings') }}">Browse available food</a>
+    </p>
 {% endif %}
 
 {% endblock %}
