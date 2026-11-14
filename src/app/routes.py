@@ -8,7 +8,7 @@ from app.models import User, FoodListing, Reservation
 import secrets
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @app.route("/")
 @login_required
@@ -379,11 +379,34 @@ def impact_dashboard():
     if current_user.role != "vendor":
         abort(403)
     update_no_shows()
+    start_date = request.args.get("start_date", "")
+    end_date = request.args.get("end_date", "")
+    filters = [FoodListing.vendor_id == current_user.id]
+    try:
+        if start_date:
+            start = datetime.strptime(start_date, "%Y-%m-%d")
+            filters.append(FoodListing.created_at >= start)
+
+        if end_date:
+            end = datetime.strptime(end_date, "%Y-%m-%d") + timedelta(days=1)
+            filters.append(FoodListing.created_at < end)
+
+    except ValueError:
+        abort(400, description="Invalid date format.")
+    listings_posted = db.session.scalar(
+        db.select(func.count(FoodListing.id))
+        .where(*filters)
+    ) or 0
+
+    portions_posted = db.session.scalar(
+        db.select(func.sum(FoodListing.portions))
+        .where(*filters)
+    ) or 0
     rescued_portions = db.session.scalar(
         db.select(func.sum(Reservation.portions))
         .join(FoodListing, Reservation.listing_id == FoodListing.id)
         .where(
-            FoodListing.vendor_id == current_user.id,
+            *filters,
             Reservation.status == "picked_up"
         )
     ) or 0
@@ -391,12 +414,35 @@ def impact_dashboard():
         db.select(func.count(Reservation.id))
         .join(FoodListing, Reservation.listing_id == FoodListing.id)
         .where(
-            FoodListing.vendor_id == current_user.id,
+            *filters,
             Reservation.status == "no-show"
         )
-    )
+    ) or 0
+    no_show_portions = db.session.scalar(
+        db.select(func.sum(Reservation.portions))
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            *filters,
+            Reservation.status == "no-show"
+        )
+    ) or 0
+
+    reserved_portions = db.session.scalar(
+        db.select(func.sum(Reservation.portions))
+        .join(FoodListing, Reservation.listing_id == FoodListing.id)
+        .where(
+            *filters,
+            Reservation.status != "cancelled"
+        )
+    ) or 0
+    no_show_rate = (no_show_portions / reserved_portions * 100) if reserved_portions else 0
     return render_template(
         "impact_dashboard.html",
+        start_date=start_date,
+        end_date=end_date,
+        listings_posted=listings_posted,
+        portions_posted=portions_posted,
         rescued_portions=rescued_portions,
-        no_show_count=no_show_count
+        no_show_count=no_show_count,
+        no_show_rate=no_show_rate
     )
