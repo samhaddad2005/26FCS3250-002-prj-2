@@ -2,11 +2,33 @@
     box-sizing: border-box;
 }
 
+:root {
+    --green: #214e36;
+    --green-dark: #183b29;
+    --green-soft: #e4efe7;
+    --line: #d5ded7;
+    --ink: #24312a;
+    --muted: #5d6b63;
+    --amber: #f2b84b;
+    --shadow: 0 4px 16px rgba(33, 78, 54, 0.10);
+}
+
 body {
     margin: 0;
     background: #f7f8f5;
     color: #24312a;
-    font: 1rem/1.5 system-ui, sans-serif;
+    font: 1.25rem/1.5 system-ui, sans-serif;
+}
+
+body:not(.vendor) {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(60rem 28rem at 90% -6rem, #dcebe0 0%, transparent 70%),
+        radial-gradient(42rem 26rem at -8% 34rem, #fbf1d8 0%, transparent 70%),
+        #f7f8f5;
+    background-repeat: no-repeat;
 }
 
 .toolbar {
@@ -82,4 +104,296 @@ input, select, textarea, button {
 .cancel-button:focus-visible {
     outline: 2px solid #8c3434;
     outline-offset: 2px;
+}
+
+:where(body:not(.vendor)) .page {
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.page--wide,
+.page--auth {
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.page--wide {
+    max-width: 68rem;
+}
+
+.page--auth {
+    max-width: 32rem;
+    margin-block: auto;
+    padding-block: 2rem;
+}
+
+.site-footer {
+    margin-top: auto;
+    padding: 1.1rem 1rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+:where(body:not(.vendor)) h1 {
+    margin: 0 0 0.5rem;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.lead {
+    margin-top: 0;
+    color: var(--muted);
+}
+
+.card {
+    padding: 1.5rem;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow);
+}
+
+.card > :first-child {
+    margin-top: 0;
+}
+
+.card > :last-child {
+    margin-bottom: 0;
+}
+
+:where(body:not(.vendor)) .flash {
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--green);
+    border-radius: 0.4rem;
+}
+
+:where(body:not(.vendor)) .error {
+    display: block;
+    margin-top: 0.25rem;
+    color: #a12d2d;
+    font-size: 1rem;
+}
+
+.field {
+    margin: 0 0 1rem;
+}
+
+.field > label {
+    display: block;
+    font-weight: 600;
+}
+
+:where(body:not(.vendor)) .page form input:not([type="submit"]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+:where(body:not(.vendor)) .page form select,
+:where(body:not(.vendor)) .page form textarea {
+    width: 100%;
+    margin-top: 0.25rem;
+    padding: 0.65rem 0.8rem;
+    background: white;
+    color: var(--ink);
+    border: 2px solid #c9d4cc;
+    border-radius: 0.4rem;
+}
+
+:where(body:not(.vendor)) .page form input:focus,
+:where(body:not(.vendor)) .page form select:focus,
+:where(body:not(.vendor)) .page form textarea:focus {
+    outline: none;
+    border-color: var(--green);
+}
+
+:where(body:not(.vendor)) input[type="checkbox"] {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: var(--green);
+}
+
+:where(body:not(.vendor)) .page form input[type="submit"],
+.button-link {
+    display: inline-block;
+    padding: 0.7rem 1.25rem;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 0.4rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+:where(body:not(.vendor)) .page form input[type="submit"] {
+    width: 100%;
+}
+
+:where(body:not(.vendor)) .page form input[type="submit"]:hover,
+.button-link:hover {
+    background: var(--green-dark);
+}
+
+:where(body:not(.vendor)) .page form input[type="submit"]:focus-visible,
+.button-link:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+}
+
+.home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.4rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.85rem;
+    background: white;
+    border: 2px solid #c9d4cc;
+    border-radius: 999px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.chip:has(input:checked) {
+    background: var(--green-soft);
+    border-color: var(--green);
+    font-weight: 600;
+}
+
+.auth {
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    box-shadow: 0 12px 36px rgba(33, 78, 54, 0.16);
+}
+
+.auth-form {
+    padding: 2.5rem;
+}
+
+.auth-form h1 {
+    margin-bottom: 0.25rem;
+}
+
+.auth-switch {
+    margin: 1.25rem 0 0;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.auth-switch a,
+.text-link {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.reservation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.25rem;
+}
+
+.reservation {
+    display: flex;
+    flex-direction: column;
+    font-size: 1rem;
+}
+
+.reservation p {
+    margin: 0 0 0.4rem;
+}
+
+.reservation h3 {
+    margin: 0 0 0.75rem;
+    font-size: 1.4rem;
+    line-height: 1.25;
+}
+
+.meta-label {
+    color: var(--muted);
+}
+
+.empty-state {
+    padding: 3rem 1.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px dashed #b9c8bd;
+    border-radius: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+}
+
+.reservation-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.status {
+    flex-shrink: 0;
+    padding: 0.15rem 0.7rem;
+    background: #eceeed;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status--active {
+    background: var(--green-soft);
+    color: var(--green-dark);
+}
+
+.status--picked_up {
+    background: var(--green);
+    color: white;
+}
+
+.status--no-show {
+    background: #fbe9e9;
+    color: #8c3434;
+}
+
+.pickup-code-box {
+    margin: 0 0 0.9rem;
+    padding: 0.75rem 1rem;
+    background: #fdf8ea;
+    border: 2px dashed var(--amber);
+    border-radius: 0.6rem;
+    text-align: center;
+}
+
+.pickup-code-box .meta-label {
+    display: block;
+    font-size: 0.9rem;
+}
+
+.pickup-code {
+    font: 700 1.9rem/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0.2em;
+}
+
+.reservation form {
+    margin-top: auto;
+    padding-top: 0.6rem;
+}
+
+@media (max-width: 46rem) {
+    .auth-form {
+        padding: 1.5rem;
+    }
 }
