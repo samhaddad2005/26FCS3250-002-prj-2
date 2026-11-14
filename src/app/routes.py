@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, abort,request
 from flask_login import login_user, logout_user, login_required, current_user
 
 from app import app, db
-from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm, CancelReservationForm
+from app.forms import SignUpForm, LoginForm, FoodListingForm, ConfirmPickupForm, CancelReservationForm, CancelFoodListingForm
 from app.models import User, FoodListing, Reservation
 
 import secrets
@@ -446,3 +446,126 @@ def impact_dashboard():
         no_show_count=no_show_count,
         no_show_rate=no_show_rate
     )
+
+# US5: Load a listing that belongs to the logged-in vendor
+# Stops with 404 if it doesn't exist, or 403 if another vendor owns it.
+def get_vendor_listing(listing_id, lock=False):
+    query = db.select(FoodListing).where(FoodListing.id == listing_id)
+    if lock:
+        query = query.with_for_update()
+    listing = db.session.scalar(query)
+    if listing is None:
+        abort(404)
+    if listing.vendor_id != current_user.id:
+        abort(403)
+    return listing
+
+# US5: Show the logged-in vendor's listing with status and portion counts.
+@app.route("/my_listings")
+@login_required
+def my_listings():
+    if current_user.role != "vendor":
+        abort(403)
+
+    listings = db.session.scalars(
+        db.select(FoodListing)
+        .where(FoodListing.vendor_id == current_user.id)
+        .order_by(FoodListing.pickup_end.desc(), FoodListing.id.desc())
+    ).all()
+
+    return render_template(
+        "my_listings.html",
+        listings=listings,
+        cancel_form=CancelFoodListingForm()
+    )
+
+# US5: Show one of the vendor's listings and every student who reserved it.
+@app.route("/listing/<int:listing_id>")
+@login_required
+def listing_detail(listing_id):
+    if current_user.role != "vendor":
+        abort(403)
+
+    listing = get_vendor_listing(listing_id)
+    return render_template("listing_detail.html", listing=listing)
+
+# US5: Edit one of the vendor's active listings.
+@app.route("/listing/<int:listing_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_listing(listing_id):
+    if current_user.role != "vendor":
+        abort(403)
+
+    # Lock only when saving, so a student can't reserve mid-edit.
+    listing = get_vendor_listing(listing_id, lock=(request.method == "POST"))
+    if listing.status != "active":
+        flash("Only active listings can be edited.")
+        return redirect(url_for("listing_detail", listing_id=listing.id))
+
+    form = FoodListingForm(obj=listing)
+    if request.method == "GET":
+        # Tags are stored as "vegan,halal" but the checkboxes need a list.
+        form.dietary_tags.data = (
+            listing.dietary_tags.split(",") if listing.dietary_tags else []
+        )
+    form.submit.label.text = "Save Changes"
+
+    if form.validate_on_submit():
+        reserved = listing.portions_reserved
+        if form.portions.data < reserved:
+            form.portions.errors.append(
+                f"Portions cannot be lower than the {reserved} already reserved."
+            )
+        else:
+            listing.title = form.title.data
+            listing.description = form.description.data
+            listing.portions = form.portions.data
+            listing.portions_remaining = form.portions.data - reserved
+            listing.pickup_location = form.pickup_location.data
+            listing.dietary_tags = ",".join(form.dietary_tags.data)
+            listing.pickup_start = form.pickup_start.data
+            listing.pickup_end = form.pickup_end.data
+            db.session.commit()
+            flash("Listing updated successfully.")
+            return redirect(url_for("listing_detail", listing_id=listing.id))
+
+    return render_template("edit_listing.html", form=form, listing=listing)
+
+# US5: Cancel one of the vendor's active listings and its active reservations.
+@app.route("/listing/<int:listing_id>/cancel", methods=["POST"])
+@login_required
+def cancel_listing(listing_id):
+    if current_user.role != "vendor":
+        abort(403)
+
+    form = CancelFoodListingForm()
+    if not form.validate_on_submit():
+        abort(400, description="Invalid or missing CSRF token.")
+
+    # Lock the listing first, then its reservations (same order as US6).
+    listing = get_vendor_listing(listing_id, lock=True)
+    if listing.status != "active":
+        flash("Only active listings can be cancelled.")
+        return redirect(url_for("listing_detail", listing_id=listing.id))
+
+    active_reservations = db.session.scalars(
+        db.select(Reservation)
+        .where(
+            Reservation.listing_id == listing.id,
+            Reservation.status == "active"
+        )
+        .with_for_update()
+    ).all()
+
+    # Cancel each active reservation and return its portions.
+    for reservation in active_reservations:
+        listing.portions_remaining += reservation.portions
+        reservation.status = "cancelled"
+    listing.cancelled = True
+    db.session.commit()
+
+    flash(
+        f"Listing cancelled. {len(active_reservations)} active "
+        f"reservation(s) were cancelled."
+    )
+    return redirect(url_for("my_listings"))

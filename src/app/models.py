@@ -43,6 +43,11 @@ class FoodListing(db.Model):
     created_at = db.Column(db.DateTime, nullable=False,default=datetime.now)
     vendor = db.relationship("User")
 
+    # US5: Every reservation on this listing, for the vendor's details page.
+    reservations = db.relationship(
+        "Reservation", viewonly=True, order_by="Reservation.id"
+    )
+
     @classmethod
     def available(cls):
         return (
@@ -54,6 +59,20 @@ class FoodListing(db.Model):
             )
             .order_by(cls.pickup_end, cls.id)
         )
+
+    # US5: Portions currently held by students (active, picked up, or no-show).
+    @property
+    def portions_reserved(self):
+        return self.portions - self.portions_remaining
+
+    # US5: Status shown on the vendor's My Listings page.
+    @property
+    def status(self):
+        if self.cancelled:
+            return "cancelled"
+        if self.pickup_end <= datetime.now():
+            return "ended"
+        return "active"
 
 class Reservation(db.Model):
     __tablename__ = "reservation"
@@ -82,5 +101,8 @@ class Reservation(db.Model):
     )
     # US6: Connect each reservation to its food listing.
     listing = db.relationship("FoodListing")
+    # US5: Connect each reservation to the student who made it.
+    student = db.relationship("User")
+
 
 
