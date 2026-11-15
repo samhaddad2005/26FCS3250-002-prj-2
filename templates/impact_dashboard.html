@@ -1,8 +1,38 @@
 {% extends "base.html" %}
 {% block main %}
-<h1>Vendor Impact Dashboard</h1>
-<h2>Portions Rescued</h2>
-<p>{{ rescued_portions }}</p>
-<h2>No-Shows</h2>
-<p>{{ no_show_count }}</p>
+<section class="impact-dashboard">
+    <h1>Vendor Impact Dashboard</h1>
+    <p class="impact-intro">See the difference your listings make on campus.</p>
+    <form method="GET" action="{{ url_for('impact_dashboard') }}" class="impact-filter">
+    <label for="start_date">Start Date:</label>
+    <input type="date" id="start_date" name="start_date" value="{{ start_date }}">
+
+    <label for="end_date">End Date:</label>
+    <input type="date" id="end_date" name="end_date" value="{{ end_date }}">
+
+    <button type="submit">Filter</button>
+</form>
+    <div class="impact-stats">
+        <div class="impact-stat-card">
+            <h2>Listings Posted</h2>
+            <p class="impact-stat-value">{{ listings_posted }}</p>
+        </div>
+        <div class="impact-stat-card">
+            <h2>Portions Posted</h2>
+            <p class="impact-stat-value">{{ portions_posted }}</p>
+        </div>
+        <div class="impact-stat-card">
+            <h2>Portions Rescued</h2>
+            <p class="impact-stat-value">{{ rescued_portions }}</p>
+        </div>
+        <div class="impact-stat-card">
+            <h2>No-Shows</h2>
+            <p class="impact-stat-value">{{ no_show_count }}</p>
+        </div>
+        <div class="impact-stat-card">
+            <h2>No-Show Rate</h2>
+            <p class="impact-stat-value">{{ "%.2f"|format(no_show_rate) }}%</p>
+        </div>
+    </div>
+</section>
 {% endblock %}

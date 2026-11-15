@@ -72,16 +72,22 @@
       Portions remaining:
       <span class="listing-portions">{{ listing.portions_remaining }}</span>
     </p>
-    <p>
-      Pickup window:
-      <span class="listing-pickup-start"
-        >{{ listing.pickup_start.strftime('%b %d, %Y %I:%M %p') }}</span
-      >
-      to
-      <span class="listing-pickup-end"
-        >{{ listing.pickup_end.strftime('%b %d, %Y %I:%M %p') }}</span
-      >
-    </p>
+    <div class="listing-pickup-window">
+      <span class="listing-pickup-label">Pickup window</span>
+      <div class="listing-pickup-times">
+        <div class="listing-pickup-time">
+          <span class="listing-pickup-time-label">From</span>
+          <span class="listing-pickup-start">{{ listing.pickup_start.strftime('%b %d, %Y') }}</span>
+          <span class="listing-pickup-clock">{{ listing.pickup_start.strftime('%I:%M %p') }}</span>
+        </div>
+        <span class="listing-pickup-separator" aria-hidden="true">→</span>
+        <div class="listing-pickup-time">
+          <span class="listing-pickup-time-label">Until</span>
+          <span class="listing-pickup-end">{{ listing.pickup_end.strftime('%b %d, %Y') }}</span>
+          <span class="listing-pickup-clock">{{ listing.pickup_end.strftime('%I:%M %p') }}</span>
+        </div>
+      </div>
+    </div>
 
     <!-- US4: Allow students to reserve portions. -->
     <form action="{{ url_for('reserve', listing_id=listing.id) }}" method="POST">
@@ -98,7 +104,9 @@
   {% endfor %}
 </ul>
 {% else %}
-<p id="no-listings">
-  No food listings are available right now. Check back later.
-</p>
+<div id="no-listings" class="listings-empty-state">
+  <span class="listings-empty-icon" aria-hidden="true">✦</span>
+  <h2>Nothing available just yet</h2>
+  <p>New food listings will appear here when vendors post. Check back soon!</p>
+</div>
 {% endif %} {% endblock %}

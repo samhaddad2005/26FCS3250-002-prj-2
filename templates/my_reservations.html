@@ -34,10 +34,12 @@
     {% endfor %}
 </div>
 {% else %}
-    <p class="empty-state">
-        You have no reservations yet.<br>
-        <a class="text-link" href="{{ url_for('listings') }}">Browse available food</a>
-    </p>
+    <div class="reservations-empty-state">
+        <span class="reservations-empty-icon" aria-hidden="true">✦</span>
+        <h2>No reservations yet</h2>
+        <p>Find something delicious and reserve your next campus pickup.</p>
+        <a class="reservations-empty-button" href="{{ url_for('listings') }}">Browse Food →</a>
+    </div>
 {% endif %}
 
 {% endblock %}
