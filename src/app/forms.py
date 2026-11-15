@@ -73,3 +73,7 @@ class ConfirmPickupForm(FlaskForm):
 # US6: Form for cancelling a reservation.
 class CancelReservationForm(FlaskForm):
     submit = SubmitField("Cancel")
+
+# US5: Form for cancelling a food listing.
+class CancelFoodListingForm(FlaskForm):
+    submit = SubmitField("Cancel Listing")

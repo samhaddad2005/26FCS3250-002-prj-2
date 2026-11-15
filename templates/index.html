@@ -4,7 +4,8 @@
 {% if current_user.role == "vendor" %}
     <p>Vendor home: post and manage your surplus food listings.</p>
     <p><a href="{{ url_for('create_listing') }}">Create Food Listing</a></p>
-    <p><a href="{{ url_for('confirm_pickup') }}">Confirm Pickup</p></a>
+    <p><a href="{{ url_for('my_listings') }}">My Listings</a></p>
+    <p><a href="{{ url_for('confirm_pickup') }}">Confirm Pickup</a></p>
 {% else %}
     <p>Student home: browse available food and manage your reservations.</p>
     <p class="home-actions">
