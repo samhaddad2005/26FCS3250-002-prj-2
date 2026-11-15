@@ -52,8 +52,8 @@ class FoodListingForm(FlaskForm):
         widget=widgets.ListWidget(prefix_label=False),
         option_widget=widgets.CheckboxInput()
     )
-    pickup_start = DateTimeLocalField("Pickup Start", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
-    pickup_end = DateTimeLocalField("Pickup End", format="%Y-%m-%dT%H:%M", validators=[DataRequired()])
+    pickup_start = DateTimeLocalField("Pickup Start", format="%Y-%m-%dT%H:%M", validators=[DataRequired()], render_kw={"max": "9999-12-31T23:59"})
+    pickup_end = DateTimeLocalField("Pickup End", format="%Y-%m-%dT%H:%M", validators=[DataRequired()], render_kw={"max": "9999-12-31T23:59"})
     submit = SubmitField("Create Listing")
 
     def validate_pickup_end(self, field):
