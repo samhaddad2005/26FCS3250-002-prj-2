@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="reservation-conflict">
+    <span class="reservation-conflict-icon" aria-hidden="true">i</span>
+    <h1>You already have a reservation</h1>
+    <p>You already have an active reservation for this listing. You can review it under My Reservations.</p>
+    <a class="reservation-conflict-button" href="{{ url_for('my_reservations') }}">View My Reservations →</a>
+    <a class="reservation-conflict-back" href="{{ url_for('listings') }}">Back to Browse Food</a>
+</div>
+{% endblock %}

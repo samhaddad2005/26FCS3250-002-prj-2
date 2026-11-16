@@ -1,20 +1,17 @@
 {% extends "base.html" %}
 
 {% block main %}
-<h1>Reservation Successful!</h1>
+<div class="reservation-success">
+    <span class="reservation-success-icon" aria-hidden="true">✓</span>
+    <h1>Reservation Successful!</h1>
+    <p class="reservation-success-intro">Your food reservation has been created.</p>
 
-<p>Your food reservation has been created.</p>
+    <div class="reservation-success-code-box">
+        <span class="reservation-success-code-label">Your pickup code</span>
+        <strong class="reservation-success-code">{{ pickup_code }}</strong>
+    </div>
 
-<p>
-    Pickup Code:
-    <strong>{{ pickup_code }}</strong>
-</p>
-
-<p>Keep this code to show the vendor when picking up your food.</p>
-
-<p>
-    <a href="{{ url_for('my_reservations') }}">
-        View My Reservations
-    </a>
-</p>
+    <p class="reservation-success-note">Keep this code to show the vendor when picking up your food.</p>
+    <a class="reservation-success-button" href="{{ url_for('my_reservations') }}">View My Reservations →</a>
+</div>
 {% endblock %}

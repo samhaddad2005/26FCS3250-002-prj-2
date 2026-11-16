@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block main %}
 <h1>Create Food Listing</h1>
-<form method="POST">
+<form method="POST" class="listing-form">
     {{ form.hidden_tag() }}
     {% for field in [form.title, form.description, form.portions,
                      form.pickup_location, form.dietary_tags,
