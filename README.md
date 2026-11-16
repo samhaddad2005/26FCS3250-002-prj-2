@@ -241,7 +241,7 @@ Selenium Manager finds or downloads ChromeDriver automatically. If port 5000 is 
 TEST_BASE_URL=http://127.0.0.1:5057 .venv/bin/python -m pytest tests/test_us7.py -v
 ```
 
-The tests register unique accounts and create listings and reservations through the browser, so no `TEST_*` credentials or pickup codes are needed. These records remain in the database. The no-show case uses a pickup window ending within 90 seconds, allowing at least 30 seconds for setup because the form accepts minute precision. Cancelled-reservation rejection remains a manual coverage gap because the current app has no cancellation UI.
+The tests register unique accounts and create listings and reservations through the browser, so no `TEST_*` credentials or pickup codes are needed. These records remain in the database. The no-show case uses a pickup window ending within 90 seconds, allowing at least 30 seconds for setup because the form accepts minute precision. Cancelled-reservation rejection is not covered by these Selenium tests; it is covered by a manual test in `tests/manual-tests.md`, using the cancel button added in US6.
 
 A successful run reports 2 passed. Run the app and the test runner in the same time zone so the pickup windows match.
 
