@@ -1,6 +1,6 @@
-Date/Time: <fill in after the Sprint 3 retrospective>
+Date/Time: 11/15/26, evening (asynchronous, in Slack)
 
-Participants: <fill in after the Sprint 3 retrospective>
+Participants: Esther Finotti (Scrum Master). The rest of the team was busy finishing the release on the final day and no other responses were received before submission, so the points below are the Scrum Master's observations from the sprint and the team's Slack threads.
 
 ## Were Sprint 2's action items carried out?
 
@@ -10,12 +10,23 @@ Participants: <fill in after the Sprint 3 retrospective>
 
 ## What went well
 
-- <fill in after the meeting>
+- Every required story (US1 to US7) and the optional US8 and US9 were merged into dev.
+- The #project2-ci channel gave an automatic, dated record of every branch, PR, and merge, which made it possible to reconstruct each sprint's progress.
+- Teammates responded quickly on the final day: Hai-Dang updated the UML, Yasemin resolved the UI merge conflicts and added the Clear filters button, and Sam fixed the manual test table, all within hours of being asked.
+- Testing the app the way the instructor will run it (a fresh docker compose up with no .env) caught real problems before submission.
 
 ## What didn't go well
 
-- <fill in after the meeting>
+- The team never used a Kanban board or GitHub issues; work was tracked only through in-person planning and Slack.
+- The Docker files were removed early in Sprint 1 and only restored on the final day, so the deployment was not tested end to end until Nov 15.
+- The UML diagrams described the planned design from Nov 2 and were not updated to match the code until the final day.
+- Releases were not tagged at the end of each sprint as planned; v1, v2, and v3 were all created at the end of the project.
+- US10 (optional) was not started.
 
-## Action items
+## Action items (for future projects)
 
-- <fill in after the meeting>
+1. Set up a Kanban board with one GitHub issue per task in Sprint 1, and move cards as work progresses.
+2. Keep the Docker deployment working from the start, and test it from a fresh clone at the end of every sprint.
+3. Merge dev into main and tag the release at each sprint's end, instead of at the end of the project.
+4. Update design documents (UML) whenever the implementation changes them.
+5. When a fix is shared in chat, say who will push it.
