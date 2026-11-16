@@ -8,13 +8,12 @@
 </head>
 <body{% if current_user.is_authenticated and current_user.role == "vendor" %} class="vendor"{% endif %}>
 <nav class="toolbar" aria-label="Main navigation">
-    <a class="brand" href="{{ url_for('index') }}">CampusEats</a>
-    <a href="{{ url_for('index') }}">Home</a>
-
+<a class="brand" href="{{ url_for('index') }}"><span aria-hidden="true">🌿</span> CampusEats <span class="team-logo">TBD</span></a>
+    <a href="{{ url_for('index') }}"{% if request.endpoint == 'index' %} style="text-decoration: underline; text-underline-offset: 6px;"{% endif %}>Home</a>
 
     {% if current_user.is_authenticated %}
         {% if current_user.role == "vendor" %}
-            <a href="{{ url_for('create_listing') }}">Create Food Listing</a>
+            <a href="{{ url_for('create_listing') }}">Create Listing</a>
             <a href="{{ url_for('my_listings') }}">My Listings</a>
             <a href="{{ url_for('impact_dashboard') }}">Impact Dashboard</a>
             <a href="{{ url_for('confirm_pickup') }}">Confirm Pickup</a>
@@ -23,8 +22,15 @@
             <a href="{{ url_for('my_reservations') }}">My Reservations</a>
         {% endif %}
 
-        <span class="toolbar-account">{{ current_user.name }}</span>
-        <a href="{{ url_for('logout') }}">Log out</a>
+        <details class="toolbar-user-menu">
+            <summary class="toolbar-user-icon" aria-label="Account menu" title="{{ current_user.name }}">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            </summary>
+            <div class="toolbar-user-dropdown">
+                <span class="toolbar-user-name">{{ current_user.name }}</span>
+                <a class="toolbar-signout" href="{{ url_for('logout') }}">Sign out</a>
+            </div>
+        </details>
     {% else %}
         <a href="{{ url_for('login') }}">Log in</a>
     {% endif %}

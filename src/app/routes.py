@@ -177,7 +177,7 @@ def reserve(listing_id):
     )
     if existing_reservation is not None:
         db.session.rollback()
-        abort(409, description="You already have an active reservation.")
+        return render_template("reservation_conflict.html"), 409
 
     # Generate a six-digit pickup code.
     try:
