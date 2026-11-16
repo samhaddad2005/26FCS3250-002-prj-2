@@ -1,6 +1,6 @@
 Date/Time: 11/15/26, evening (asynchronous, in Slack)
 
-Participants: Esther Finotti (Scrum Master). The rest of the team was busy finishing the release on the final day and no other responses were received before submission, so the points below are the Scrum Master's observations from the sprint and the team's Slack threads.
+Participants: Esther Finotti (Scrum Master), Hai-Dang Le. The rest of the team was busy finishing the release on the final day and did not respond before submission. Points marked (Hai-Dang) are from his reply in Slack; the rest are the Scrum Master's observations from the sprint and the team's Slack threads.
 
 ## Were Sprint 2's action items carried out?
 
@@ -14,6 +14,7 @@ Participants: Esther Finotti (Scrum Master). The rest of the team was busy finis
 - The #project2-ci channel gave an automatic, dated record of every branch, PR, and merge, which made it possible to reconstruct each sprint's progress.
 - Teammates responded quickly on the final day: Hai-Dang updated the UML, Yasemin resolved the UI merge conflicts and added the Clear filters button, and Sam fixed the manual test table, all within hours of being asked.
 - Testing the app the way the instructor will run it (a fresh docker compose up with no .env) caught real problems before submission.
+- The team managed its progress and worked together much better than in Sprints 1 and 2, and did a better job of finishing tasks without carrying them over to the next sprint. (Hai-Dang)
 
 ## What didn't go well
 
@@ -22,6 +23,7 @@ Participants: Esther Finotti (Scrum Master). The rest of the team was busy finis
 - The UML diagrams described the planned design from Nov 2 and were not updated to match the code until the final day.
 - Releases were not tagged at the end of each sprint as planned; v1, v2, and v3 were all created at the end of the project.
 - US10 (optional) was not started.
+- Some tasks were still finished close to the deadline, which left less time for testing and reviewing. (Hai-Dang)
 
 ## Action items (for future projects)
 
@@ -30,3 +32,4 @@ Participants: Esther Finotti (Scrum Master). The rest of the team was busy finis
 3. Merge dev into main and tag the release at each sprint's end, instead of at the end of the project.
 4. Update design documents (UML) whenever the implementation changes them.
 5. When a fix is shared in chat, say who will push it.
+6. Keep communicating regularly, and finish tasks earlier so there is more time to test and fix problems. (Hai-Dang)

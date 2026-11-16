@@ -22,6 +22,10 @@ Completed: 16 points (US5, US6, US7, US8, US9). Of the 11 new points planned for
 
 - US10: Rate a pickup (optional, 3 points). Not started; dropped so the final day could go to testing and deployment.
 
+## Team feedback
+
+- Hai-Dang Le: the team made good progress, completing important features like US5 and US6, improving the UI, and working on testing and deployment.
+
 ## Product Owner feedback
 
 - No Product Owner review was held before the Nov 15 deadline. The final release is submitted for grading.
