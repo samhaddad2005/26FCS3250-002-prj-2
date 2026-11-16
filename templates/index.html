@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block main %}
+<h1>Welcome, {{ current_user.name }}</h1>
+{% if current_user.role == "vendor" %}
+    <section class="vendor-home">
+        <p class="vendor-intro">Manage your surplus food and make a difference on campus.</p>
+        <div class="vendor-actions">
+            <a class="vendor-action-card" href="{{ url_for('create_listing') }}">
+                <span class="vendor-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#c76d4e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18h28l-3 24H13l-3-24Z" fill="#f0e5d8"/><path d="M17 19v-5a7 7 0 0 1 14 0v5"/><path d="M22 17c-5-5-5-10 0-13 4 3 5 8 0 13Z" fill="#a4b58c" stroke="#596b4d"/><path d="M26 17c1-7 5-10 10-10-1 6-4 9-10 10Z" fill="#a4b58c" stroke="#596b4d"/></svg></span>
+                <h2>Create Food Listing</h2>
+                <p>Share available food with students.</p>
+                <span class="vendor-action-button">Create Listing →</span>
+            </a>
+            <a class="vendor-action-card" href="{{ url_for('my_listings') }}">
+                <span class="vendor-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#c76d4e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="11" y="8" width="26" height="32" rx="3" fill="#f0e5d8"/><path d="M17 17h14M17 24h14M17 31h9"/><circle cx="34" cy="34" r="9" fill="#faf7f2" stroke="#596b4d"/><path d="m30 34 3 3 5-6" stroke="#596b4d"/></svg></span>
+                <h2>My Listings</h2>
+                <p>View and manage your food listings.</p>
+                <span class="vendor-action-button">Manage Listings →</span>
+            </a>
+            <a class="vendor-action-card" href="{{ url_for('confirm_pickup') }}">
+                <span class="vendor-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#c76d4e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="15" width="26" height="25" rx="3" fill="#f0e5d8"/><path d="M8 22h26M17 15v25"/><circle cx="35" cy="14" r="10" fill="#faf7f2" stroke="#596b4d"/><path d="m30 14 3 3 6-6" stroke="#596b4d" stroke-width="2.7"/></svg></span>
+                <h2>Confirm Pickup</h2>
+                <p>Verify a student's food pickup.</p>
+                <span class="vendor-action-button">Confirm Pickup →</span>
+            </a>
+            <a class="vendor-action-card" href="{{ url_for('impact_dashboard') }}">
+                <span class="vendor-action-icon" aria-hidden="true"><svg viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="#c76d4e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 40h35"/><rect x="10" y="26" width="7" height="14" rx="1" fill="#f0e5d8"/><rect x="21" y="19" width="7" height="21" rx="1" fill="#e8b59e"/><rect x="32" y="10" width="7" height="30" rx="1" fill="#a4b58c" stroke="#596b4d"/><path d="m11 19 11-9 8 3 10-9" stroke="#596b4d"/><path d="M34 4h6v6" stroke="#596b4d"/></svg></span>
+                <h2>Impact Dashboard</h2>
+                <p>See the difference your listings make.</p>
+                <span class="vendor-action-button">View Impact →</span>
+            </a>
+        </div>
+    </section>
+{% else %}
+    <p class="student-intro">Discover available food on campus and make your next pickup easy.</p>
+    <div class="student-actions">
+        <a class="student-action-card" id="browse-listings-link" href="{{ url_for('listings') }}">
+            <span class="student-action-icon" aria-hidden="true">✦</span>
+            <h2>Browse Food</h2>
+            <p>Explore available food listings and find your next campus pickup.</p>
+            <span class="student-action-button">Explore Listings →</span>
+        </a>
+        <a class="student-action-card" href="{{ url_for('my_reservations') }}">
+            <span class="student-action-icon" aria-hidden="true">✓</span>
+            <h2>My Reservations</h2>
+            <p>Keep track of your reserved food and upcoming pickups.</p>
+            <span class="student-action-button">View Reservations →</span>
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

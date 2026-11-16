@@ -142,17 +142,17 @@ Before writing any code, split the backlog across the three sprints and record i
 * Planned burndown: list the story points remaining at the start and after each planned sprint.
 
 ```
-Team capacity (story points per sprint): 10
+Team capacity (story points per sprint): 12
 
-Justification (one or two sentences: team size, hours available, course load): <justification>
+Justification (one or two sentences: team size, hours available, course load): There are five team members and each one has about 3-4 days (roughly 10 hours) to contribute per sprint. After the due date moved to November 15, the team agreed to raise capacity to 12 points per sprint so the bonus stories US8 to US10 fit alongside the required stories.
 ```
 
 | Sprint | User stories (in order) | Story points planned | Points remaining after sprint | Dependencies checked (Y/N) |
 | --- | --- | --- | --- | --- |
-| Sprint 1 | US1, US2, US3 | 10 | 16 | Y |
-| Sprint 2 | US4, US7 | 8 | 8 | Y |
-| Sprint 3 | US6, US5 | 8 | 0 | Y |
-| **Total** | 7 stories | 26 | — | — |
+| Sprint 1 | US1, US2, US3, US8 | 12 | 22 | Y |
+| Sprint 2 | US4, US7, US9 | 11 | 11 | Y |
+| Sprint 3 | US6, US5, US10 | 11 | 0 | Y |
+| **Total** | 10 stories | 34 | — | — |
 
 # Sprint Boards
 
@@ -218,6 +218,49 @@ Write one automated black box test with Selenium for one user story of your choi
 | --- | --- | --- | --- | --- | --- |
 | US1 | 2: duplicate email rejected | Name | 99/99/26 | passed |  |
 | ... | ... | ... | ... | ... | ... |
+
+## Run the app
+
+From the repository root, run:
+
+docker compose up --build
+
+Then open http://localhost:5000. No `.env` file is needed; the defaults in `docker-compose.yml` are used unless you create one from `.env.example`.
+
+Seed accounts are created automatically on first start, along with a few sample listings:
+
+| Role    | Email                   | Password          |
+| ---     | ---                     | ---               |
+| Vendor  | vendor@campuseats.test  | demo-vendor-pass  |
+| Student | student@campuseats.test | demo-student-pass |
+
+If port 5000 is already in use on your machine, set `WEB_PORT=5001` (or another free port) in `.env` and open that port instead.
+
+## Run the US7 Selenium tests
+
+Install Google Chrome, then install the test dependencies:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+```
+
+Start the app with its PostgreSQL connection and secret key configured in `.env`, using a test database. With the app running at `http://localhost:5000`, run:
+
+```sh
+.venv/bin/python -m pytest tests/test_us7.py -v
+```
+
+Selenium Manager finds or downloads ChromeDriver automatically. If port 5000 is occupied (for example, by macOS AirPlay), start the app on another port in a separate terminal and set the test URL:
+
+```sh
+.venv/bin/python -m flask --app src/run.py run --host 127.0.0.1 --port 5057
+TEST_BASE_URL=http://127.0.0.1:5057 .venv/bin/python -m pytest tests/test_us7.py -v
+```
+
+The tests register unique accounts and create listings and reservations through the browser, so no `TEST_*` credentials or pickup codes are needed. These records remain in the database. The no-show case uses a pickup window ending within 90 seconds, allowing at least 30 seconds for setup because the form accepts minute precision. Cancelled-reservation rejection is not covered by these Selenium tests; it is covered by a manual test in `tests/manual-tests.md`, using the cancel button added in US6.
+
+A successful run reports 2 passed. Run the app and the test runner in the same time zone so the pickup windows match.
 
 # Repository Structure
 

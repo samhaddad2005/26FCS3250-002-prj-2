@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block page_class %} page--wide{% endblock %}
+
+{% block main %}
+<h1>My Reservations</h1>
+{% if reservations %}
+<p class="lead">Show the pickup code to the vendor during the pickup window.</p>
+<div class="reservation-grid">
+    {% for reservation in reservations %}
+        <div class="reservation card">
+            <div class="reservation-head">
+                <h3>{{ reservation.listing.title }}</h3>
+                <span class="status status--{{ reservation.status }}">{{ reservation.status }}</span>
+            </div>
+
+            <p class="pickup-code-box">
+                <span class="meta-label">Pickup Code:</span>
+                <strong class="pickup-code">{{ reservation.pickup_code }}</strong>
+            </p>
+            <p><span class="meta-label">Vendor:</span> {{ reservation.listing.vendor.name }}</p>
+            <p><span class="meta-label">Location:</span> {{ reservation.listing.pickup_location }}</p>
+            <p><span class="meta-label">Pickup Start:</span> {{ reservation.listing.pickup_start.strftime('%b %d, %Y %I:%M %p') }}</p>
+            <p><span class="meta-label">Pickup End:</span> {{ reservation.listing.pickup_end.strftime('%b %d, %Y %I:%M %p') }}</p>
+            <p><span class="meta-label">Portions:</span> {{ reservation.portions }}</p>
+            {% if reservation.status == "active" and reservation.listing.pickup_end > now %}
+                <form action="{{ url_for('cancel_reservation', reservation_id=reservation.id) }}" method="POST">
+                    {{ cancel_form.hidden_tag() }}
+                    <button type="submit" class="cancel-button">
+                        Cancel Reservation
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="reservations-empty-state">
+        <span class="reservations-empty-icon" aria-hidden="true">✦</span>
+        <h2>No reservations yet</h2>
+        <p>Find something delicious and reserve your next campus pickup.</p>
+        <a class="reservations-empty-button" href="{{ url_for('listings') }}">Browse Food →</a>
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block main %}
+<style>
+    h1 { color: #3f4935; }
+    form { max-width: 480px; margin: 2rem auto; padding: 2rem; background: #fffdf8; border-radius: 16px; box-shadow: 0 4px 16px rgba(55, 45, 35, 0.10); }
+    form p { display: flex; flex-direction: column; gap: 8px; }
+    form input[type="text"] { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #d6dcd2; border-radius: 8px; font: inherit; }
+    form input:not([type="hidden"]):not([type="submit"]) {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px;
+        border: 1px solid #d6dcd2;
+        border-radius: 8px;
+        font: inherit;
+    }
+</style>
+<h1>Confirm Pickup</h1>
+
+<form method="POST">
+{{ form.hidden_tag() }}
+{% for error in form.csrf_token.errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+
+<p>
+    {{ form.pickup_code.label }}
+    {{ form.pickup_code }}
+</p>
+{% for error in form.pickup_code.errors %}
+    <p>{{ error }}</p>
+{% endfor %}
+
+{{ form.submit() }}
+</form>
+
+<h2>No-shows</h2>
+{% if no_shows %}
+    <ul>
+    {% for reservation in no_shows %}
+        <li>
+            {{ reservation.listing_title }} - {{ reservation.student_name }}
+            ({{ reservation.portions }} portion(s)) - No-show
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <div class="no-shows-empty">
+        <span class="no-shows-empty-icon" aria-hidden="true">✓</span>
+        <h3>All caught up!</h3>
+        <p>No missed pickups to report.</p>
+        <p class="no-shows-empty-note">Missed pickups will appear here when applicable.</p>
+    </div>
+{% endif %}
+
+{% endblock %}
