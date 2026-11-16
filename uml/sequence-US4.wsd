@@ -1,0 +1,95 @@
+
+@startuml US4
+title US4 - Student Reserves Food Portions
+
+actor Student
+participant Browser
+participant "Flask Route: reserve()" as Route
+database PostgreSQL as DB
+
+Student -> Browser : Select 1 or 2 portions and click Reserve
+Browser -> Route : POST /reserve/{listing_id} (portions)
+
+Route -> Route : Check authentication (@login_required)
+alt Not authenticated
+    Route --> Browser : Redirect to login
+else Authenticated
+    Route -> Route : Check current_user.role == "student"
+    alt Not a student
+        Route --> Browser : 403 Forbidden
+    else Student
+        Route -> DB : SELECT FoodListing FOR UPDATE
+        DB --> Route : Listing or None
+
+        alt Listing not found
+            Route -> DB : ROLLBACK
+            Route --> Browser : 404 Not Found
+        else Listing found
+            Route -> Route : Check cancelled or pickup_end <= now
+
+            alt Cancelled or expired
+                Route -> DB : ROLLBACK
+                Route --> Browser : 409 Conflict
+            else Listing available
+                Route -> Route : Parse portions as integer
+                Route -> Route : Check portions in (1, 2)
+
+                alt Invalid portions
+                    Route -> DB : ROLLBACK
+                    Route --> Browser : 400 Bad Request
+                else Valid portions
+                    Route -> Route : Check portions <= portions_remaining
+
+                    alt Not enough portions
+                        Route -> DB : ROLLBACK
+                        Route --> Browser : 409 Conflict
+                    else Enough portions
+                        Route -> DB : Query active reservation for student and listing
+                        DB --> Route : Existing reservation or None
+
+                        alt Active reservation exists
+                            Route -> DB : ROLLBACK
+                            Route --> Browser : 409 Conflict
+                        else No active reservation
+                            Route -> Route : Call generate_pickup_code()
+                            Route -> DB : Check pickup code uniqueness
+                            DB --> Route : Existing code or None
+
+                            alt Unable to generate unique code
+                                Route -> DB : ROLLBACK
+                                Route --> Browser : 503 Service Unavailable
+                            else Pickup code generated
+                                Route -> Route : Decrease listing.portions_remaining
+                                Route -> Route : Create Reservation(status="active")
+                                Route -> DB : Add reservation and COMMIT
+
+                                alt IntegrityError
+                                    DB --> Route : IntegrityError
+                                    Route -> DB : ROLLBACK
+                                    Route --> Browser : 409 Conflict
+                                else Commit succeeds
+                                    DB --> Route : Committed
+                                    Route --> Browser : 201 Created + reservation_success.html
+                                    Browser --> Student : Show 6-digit pickup code
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+note over Route, DB
+  Reservation logic is implemented directly
+  in the Flask reserve() route.
+
+  SELECT FOR UPDATE locks the listing row
+  to prevent concurrent overbooking.
+
+  Listing updates and reservation creation
+  are committed in the same transaction.
+end note
+
+@enduml

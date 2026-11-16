@@ -1,12 +1,76 @@
+
 @startuml class
+title CampusEats - Class Diagram
+left to right direction
 
 class User {
-    email
-    name
-    creation_date
-    role
-    password
-    active
+  +id: Integer
+  +name: String
+  +email: String
+  +password_hash: String
+  +role: String
+  +set_password(password)
+  +check_password(password): Boolean
 }
+
+class FoodListing {
+  +id: Integer
+  +vendor_id: Integer
+  +title: String
+  +description: Text
+  +portions: Integer
+  +portions_remaining: Integer
+  +cancelled: Boolean
+  +pickup_location: String
+  +dietary_tags: String
+  +pickup_start: DateTime
+  +pickup_end: DateTime
+  +created_at: DateTime
+  --
+  +available(): Query
+  +portions_reserved: Integer
+  +status: String
+}
+
+class Reservation {
+  +id: Integer
+  +listing_id: Integer
+  +student_id: Integer
+  +portions: Integer
+  +pickup_code: String
+  +status: String
+}
+
+User "1" -- "0..*" FoodListing : creates (vendor)
+User "1" -- "0..*" Reservation : places (student)
+FoodListing "1" -- "0..*" Reservation : receives
+
+note right of User
+  US1: role = student or vendor.
+  Passwords are stored as bcrypt hashes.
+end note
+
+note bottom of FoodListing
+  US2, US3, US5 implementation.
+
+  dietary_tags is stored as a String.
+  portions_remaining tracks available portions.
+  cancelled indicates listing cancellation.
+  created_at records listing creation time.
+
+  available() filters available listings.
+  status and portions_reserved are
+  calculated properties.
+end note
+
+note bottom of Reservation
+  US4, US6, US7 implementation.
+
+  Reservations belong to a student
+  and a food listing.
+
+  status tracks reservation state.
+  pickup_code is a unique 6-digit code.
+end note
 
 @enduml
