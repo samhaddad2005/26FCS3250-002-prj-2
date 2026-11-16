@@ -32,3 +32,24 @@ Testers: Miles Porter and Hai-Dang Le.
 - The due date moved to Nov 15, so capacity was raised from 10 to 12 points per sprint and the optional stories were added to the plan: US8 in Sprint 1, US9 in Sprint 2, US10 in Sprint 3.
 - US2 and US3 wait for Sam's go-ahead once the US1 PR is ready for testing and approval.
 - Everyone who works on the project posts a daily scrum in #daily-scrum.
+
+## Task tracking
+
+The team did not keep a separate Kanban board. Stories were assigned at sprint planning (in person), and work was tracked in Slack: status updates in #project2-dev and #daily-scrum, and GitHub events in #project2-ci, where the GitHub bot posted each event as it happened. Those bot posts map to the board columns as follows:
+
+| Column | Evidence in #project2-ci |
+| --- | --- |
+| To Do | Story assigned at sprint planning (see above) |
+| In Progress | "Branch created" |
+| In Review | "Pull request opened" (reviewers and tester assigned) |
+| Done | "Pull request merged" into dev |
+
+Status at the end of Sprint 1 (Nov 2), from the bot posts:
+
+| Column | Work |
+| --- | --- |
+| Done | US1 (#3, merged Oct 29), US2 (#5, merged Nov 2), US3 (#9, merged Nov 2), US3 Selenium tests (#10, merged Nov 2) |
+| In Review | US1 tests (#4), US2 manual tests (#6), Sprint 0 backlog update (#7), UML diagrams (#8) |
+| To Do | US8 (carried over to Sprint 2) |
+
+board.png shows the #project2-ci posts for Sprint 0 and Sprint 1 (Oct 22 - Nov 2), stacked in date order from top to bottom.

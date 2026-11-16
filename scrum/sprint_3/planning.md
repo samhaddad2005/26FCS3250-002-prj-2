@@ -28,3 +28,24 @@ Stories are due Nov 12, leaving Nov 13-15 for testing, integration, documentatio
 - @-mention teammates in #project2-dev when work is ready for review or testing, instead of relying on the CI bot.
 - Post a quick status update in #project2-dev when something is finished.
 - The sprint's tester is assigned during sprint planning (Sam Haddad for Sprint 3).
+
+## Task tracking
+
+The team did not keep a separate Kanban board. Stories were assigned at sprint planning (in person), and work was tracked in Slack: status updates in #project2-dev and #daily-scrum, and GitHub events in #project2-ci, where the GitHub bot posted each event as it happened. Those bot posts map to the board columns as follows:
+
+| Column | Evidence in #project2-ci |
+| --- | --- |
+| To Do | Story assigned at sprint planning (see above) |
+| In Progress | "Branch created" |
+| In Review | "Pull request opened" (reviewers and tester assigned) |
+| Done | "Pull request merged" into dev |
+
+Status during Sprint 3, as of Nov 15, from the bot posts:
+
+| Column | Work |
+| --- | --- |
+| Done | US7 (#15) and US8 (#11) (merged Nov 10), US6 (#16, merged Nov 10), US9 (#17, merged Nov 11), student UI (#18, merged Nov 13), US5 (#19, merged Nov 15), US5 manual tests (#25, merged Nov 15) |
+| In Review | Scrum evidence (#20), vendor UI (#21), deployment files (#26), manual test table fix (#28), UML diagrams (#8) |
+| To Do | US10 (optional) |
+
+board.png shows the #project2-ci posts for Sprint 3 (Nov 9 - Nov 15), stacked in date order from top to bottom.

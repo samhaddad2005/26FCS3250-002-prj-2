@@ -27,3 +27,24 @@ Testing and review: Sam Haddad, who also works on the UI design. Yasemin Fekadu 
 
 - One tester's approval is enough to merge a PR, and the PR's author merges it into dev after approval.
 - Each story gets a target date so the sprint ends on a Sunday.
+
+## Task tracking
+
+The team did not keep a separate Kanban board. Stories were assigned at sprint planning (in person), and work was tracked in Slack: status updates in #project2-dev and #daily-scrum, and GitHub events in #project2-ci, where the GitHub bot posted each event as it happened. Those bot posts map to the board columns as follows:
+
+| Column | Evidence in #project2-ci |
+| --- | --- |
+| To Do | Story assigned at sprint planning (see above) |
+| In Progress | "Branch created" |
+| In Review | "Pull request opened" (reviewers and tester assigned) |
+| Done | "Pull request merged" into dev |
+
+Status at the end of Sprint 2 (Nov 8), from the bot posts:
+
+| Column | Work |
+| --- | --- |
+| Done | US4 (#12, merged Nov 5), US4 manual tests (#14, merged Nov 5), US1 tests (#4), US2 manual tests (#6), and Sprint 0 backlog update (#7) (all three merged Nov 7) |
+| In Review | US8 (#11), US7 (#15), UML diagrams (#8) |
+| To Do | US9 (carried over to Sprint 3) |
+
+board.png shows the #project2-ci posts for Sprint 2 (Nov 3 - Nov 8), stacked in date order from top to bottom.
