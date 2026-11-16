@@ -1,72 +1,78 @@
+
 @startuml US4
- title US4 - Student Reserves Food Portions
+title US4 - Student Reserves Food Portions
 
 actor Student
 participant Browser
-participant "Flask Route" as Route
-participant "Reservation Service (planned)" as Service
+participant "Flask Route: reserve()" as Route
 database PostgreSQL as DB
 
 Student -> Browser : Select 1 or 2 portions and click Reserve
 Browser -> Route : POST /reserve/{listing_id} (portions)
-Route -> Route : Check authenticated user and role
-alt Not logged in or not a student
-    Route --> Browser : 401 Unauthorized / 403 Forbidden
-    Browser --> Student : Show access error
-else Authenticated student
-    Route -> Route : Get student_id from authenticated session
-    alt portions not in {1, 2}
-        Route --> Browser : 400 Bad Request
-        Browser --> Student : Show invalid portions error
-    else Valid requested portions
-        Route -> Service : create_reservation(student_id, listing_id, portions)
-        Service -> DB : BEGIN TRANSACTION
-        Service -> DB : SELECT listing FOR UPDATE by listing_id
-        DB --> Service : listing or not found
+
+Route -> Route : Check authentication (@login_required)
+alt Not authenticated
+    Route --> Browser : Redirect to login
+else Authenticated
+    Route -> Route : Check current_user.role == "student"
+    alt Not a student
+        Route --> Browser : 403 Forbidden
+    else Student
+        Route -> DB : SELECT FoodListing FOR UPDATE
+        DB --> Route : Listing or None
 
         alt Listing not found
-            Service -> DB : ROLLBACK
-            Service --> Route : listing_not_found
+            Route -> DB : ROLLBACK
             Route --> Browser : 404 Not Found
-            Browser --> Student : Show listing not found
         else Listing found
-            Service -> Service : Check listing active and pickup window valid
-            alt Listing cancelled or pickup window ended
-                Service -> DB : ROLLBACK
-                Service --> Route : listing_unavailable
+            Route -> Route : Check cancelled or pickup_end <= now
+
+            alt Cancelled or expired
+                Route -> DB : ROLLBACK
                 Route --> Browser : 409 Conflict
-                Browser --> Student : Show listing unavailable
             else Listing available
-                Service -> DB : Check active reservation for student and listing
-                DB --> Service : duplicate status
-                alt Active reservation already exists
-                    Service -> DB : ROLLBACK
-                    Service --> Route : duplicate_reservation
-                    Route --> Browser : 409 Conflict
-                    Browser --> Student : Show already reserved
-                else No active reservation
-                    Service -> Service : Check remaining_portions >= portions
+                Route -> Route : Parse portions as integer
+                Route -> Route : Check portions in (1, 2)
+
+                alt Invalid portions
+                    Route -> DB : ROLLBACK
+                    Route --> Browser : 400 Bad Request
+                else Valid portions
+                    Route -> Route : Check portions <= portions_remaining
+
                     alt Not enough portions
-                        Service -> DB : ROLLBACK
-                        Service --> Route : insufficient_portions
+                        Route -> DB : ROLLBACK
                         Route --> Browser : 409 Conflict
-                        Browser --> Student : Show insufficient portions
                     else Enough portions
-                        Service -> Service : Generate unique 6-character pickup code
-                        Service -> DB : UPDATE listing remaining_portions -= portions
-                        Service -> DB : INSERT reservation (student_id, listing_id, portions, pickup_code, active)
-                        alt Database write or COMMIT fails
-                            DB --> Service : database error
-                            Service -> DB : ROLLBACK (if transaction active)
-                            Service --> Route : reservation_failed
-                            Route --> Browser : 500 Internal Server Error
-                            Browser --> Student : Show reservation error
-                        else Writes succeed
-                            Service -> DB : COMMIT
-                            DB --> Service : committed
-                            Service --> Route : reservation_id, pickup_code
-                            Route --> Browser : 201 Created (reservation_id, pickup_code)
-                            Browser --> Student : Show confirmation and pickup code
+                        Route -> DB : Query active reservation for student and listing
+                        DB --> Route : Existing reservation or None
+
+                        alt Active reservation exists
+                            Route -> DB : ROLLBACK
+                            Route --> Browser : 409 Conflict
+                        else No active reservation
+                            Route -> Route : Call generate_pickup_code()
+                            Route -> DB : Check pickup code uniqueness
+                            DB --> Route : Existing code or None
+
+                            alt Unable to generate unique code
+                                Route -> DB : ROLLBACK
+                                Route --> Browser : 503 Service Unavailable
+                            else Pickup code generated
+                                Route -> Route : Decrease listing.portions_remaining
+                                Route -> Route : Create Reservation(status="active")
+                                Route -> DB : Add reservation and COMMIT
+
+                                alt IntegrityError
+                                    DB --> Route : IntegrityError
+                                    Route -> DB : ROLLBACK
+                                    Route --> Browser : 409 Conflict
+                                else Commit succeeds
+                                    DB --> Route : Committed
+                                    Route --> Browser : 201 Created + reservation_success.html
+                                    Browser --> Student : Show 6-digit pickup code
+                                end
+                            end
                         end
                     end
                 end
@@ -75,9 +81,15 @@ else Authenticated student
     end
 end
 
-note over Service, DB
-  SELECT FOR UPDATE and all changes share one transaction.
-  Concurrent requests cannot both reserve the final portion.
-  Service is a proposed design component, not verified implementation.
+note over Route, DB
+  Reservation logic is implemented directly
+  in the Flask reserve() route.
+
+  SELECT FOR UPDATE locks the listing row
+  to prevent concurrent overbooking.
+
+  Listing updates and reservation creation
+  are committed in the same transaction.
 end note
+
 @enduml
