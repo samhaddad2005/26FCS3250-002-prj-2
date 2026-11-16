@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block main %}
+<p><a class="text-link" href="{{ url_for('listing_detail', listing_id=listing.id) }}">&larr; Back to listing</a></p>
+<h1>Edit Food Listing</h1>
+{% if listing.portions_reserved > 0 %}
+    <p class="lead" id="reserved-note">
+        {{ listing.portions_reserved }} portion(s) are already reserved, so portions can't be set lower than that.
+    </p>
+{% endif %}
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {% for field in [form.title, form.description, form.portions,
+                     form.pickup_location, form.dietary_tags,
+                     form.pickup_start, form.pickup_end] %}
+    <p>{{ field.label }} <br> {{ field() }}
+        {% for error in field.errors %}<br><span class="error">{{ error }}</span>{% endfor %}
+    </p>
+    {% endfor %}
+    <p>{{ form.submit() }}</p>
+</form>
+{% endblock %}
