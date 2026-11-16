@@ -1605,3 +1605,24 @@ body:not(.vendor) .reservation-conflict-back:focus-visible {
         padding: 32px 20px;
     }
 }
+.clear-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    margin-left: 8px;
+    background-color: #f4f5f0;
+    color: #596b4d;
+    border: 1px solid #cbd5c5;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+    background-color: #e5ebe1;
+    color: #40513a;
+    text-decoration: none;
+}

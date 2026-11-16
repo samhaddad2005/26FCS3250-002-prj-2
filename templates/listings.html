@@ -45,6 +45,7 @@
   value="{{ selected_location or '' }}"
 >
 <button type="submit">Apply Filters</button>
+<a href="{{ url_for('listings') }}" class="clear-filter-btn">Clear Filter</a>
 </form>
 {% if listings %}
 <ul id="listings">
