@@ -219,6 +219,23 @@ Write one automated black box test with Selenium for one user story of your choi
 | US1 | 2: duplicate email rejected | Name | 99/99/26 | passed |  |
 | ... | ... | ... | ... | ... | ... |
 
+## Run the app
+
+From the repository root, run:
+
+docker compose up --build
+
+Then open http://localhost:5000. No `.env` file is needed; the defaults in `docker-compose.yml` are used unless you create one from `.env.example`.
+
+Seed accounts are created automatically on first start, along with a few sample listings:
+
+| Role    | Email                   | Password          |
+| ---     | ---                     | ---               |
+| Vendor  | vendor@campuseats.test  | demo-vendor-pass  |
+| Student | student@campuseats.test | demo-student-pass |
+
+If port 5000 is already in use on your machine, set `WEB_PORT=5001` (or another free port) in `.env` and open that port instead.
+
 ## Run the US7 Selenium tests
 
 Install Google Chrome, then install the test dependencies:

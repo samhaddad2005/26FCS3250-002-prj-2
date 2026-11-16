@@ -3,3 +3,5 @@ venv
 *.db
 .venv/
 __pycache__/
+# Office lock/owner files created while a document is open
+~$*
