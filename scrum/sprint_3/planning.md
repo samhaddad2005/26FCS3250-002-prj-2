@@ -40,12 +40,12 @@ The team did not keep a separate Kanban board. Stories were assigned at sprint p
 | In Review | "Pull request opened" (reviewers and tester assigned) |
 | Done | "Pull request merged" into dev |
 
-Status during Sprint 3, as of Nov 15, from the bot posts:
+Status at the end of Sprint 3 (Nov 15, 9:30 PM), from the bot posts:
 
 | Column | Work |
 | --- | --- |
-| Done | US7 (#15) and US8 (#11) (merged Nov 10), US6 (#16, merged Nov 10), US9 (#17, merged Nov 11), student UI (#18, merged Nov 13), US5 (#19, merged Nov 15), US5 manual tests (#25, merged Nov 15) |
-| In Review | Scrum evidence (#20), vendor UI (#21), deployment files (#26), manual test table fix (#28), UML diagrams (#8) |
+| Done | US7 (#15) and US8 (#11) (merged Nov 10), US6 (#16, merged Nov 10), US9 (#17, merged Nov 11), student UI (#18, merged Nov 13), US5 (#19, merged Nov 15), US5 manual tests (#25, merged Nov 15), UML diagrams (#8, merged Nov 15), manual test table fix (#28, merged Nov 15), deployment files (#26, merged Nov 15), vendor UI and Clear Filter button (#21, merged Nov 15) |
+| In Review | US1, US3, US8 manual tests (#29), Scrum evidence (#20) |
 | To Do | US10 (optional) |
 
 board.png shows the #project2-ci posts for Sprint 3 (Nov 9 - Nov 15), stacked in date order from top to bottom.
